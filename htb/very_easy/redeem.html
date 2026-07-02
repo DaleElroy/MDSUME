@@ -45,15 +45,15 @@
       Dancing
     </div>
     <div class="writeup-title-row">
-      <h1 class="writeup-title">Dancing</h1>
-      <span class="diff-badge">MEDIUM</span>
+      <h1 class="writeup-title">Redeem</h1>
+      <span class="diff-badge">Very Easy</span>
     </div>
     <div class="writeup-meta">
       <span class="meta-badge">🪟 Windows</span>
       <span class="meta-badge">🎯 Hack The Box</span>
       <span class="meta-badge">📌 Resume Evidence</span>
     </div>
-    <p class="writeup-sub">A Windows-based machine focused on SMB share enumeration, identifying an open share, and locating sensitive files through manual exploration of accessible network shares.</p>
+    <p class="writeup-sub">Redeemer is a very easy Linux machine which explores the enumeration and exploitation of a Redis database server while showcasing the redis-cli command line utility and basic commands to interact with the Redis service.</p>
   </section>
 
   <div class="writeup-body">
@@ -78,7 +78,7 @@
             <div class="code-block-dots"><span></span><span></span><span></span></div>
             <div class="code-block-label">terminal — nmap</div>
           </div>
-          <pre><span class="c-comment"># Full port scan</span>
+          <pre><span class="c-comment"># Default Script and Service Detection port scan</span>
 <span class="c-prompt">$</span> nmap -p- --min-rate=1000 -T4 10.10.10.exam
 
 <span class="c-comment"># Service detection on SMB ports</span>
@@ -97,6 +97,14 @@
           <div class="callout-text"><strong>Why this matters:</strong> SMB ports are among the first things checked on any Windows target. Exposed SMB often leads to high-impact findings through null sessions, guest access, or misconfigured share permissions.</div>
         </div>
       </section>
+
+
+
+
+
+
+
+
 
       <!-- 2. INITIAL ACCESS -->
       <section id="access" class="writeup-section reveal">
