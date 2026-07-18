@@ -233,6 +233,41 @@
   .link-row .btn{padding:9px 16px; font-size:13px;}
   .project2-thumb{height:100px;}
 
+  /* PROJECT CARD V2 — matches requested layout, uses page's own tokens/colors only */
+  .proj-card{padding:16px;}
+  /* Ideal source image size: 800x450px (16:9). Anything you drop in will be
+     cropped/filled to this ratio automatically via object-fit, so exact
+     pixel size isn't critical — just keep it roughly 16:9 for the best crop. */
+  .proj-thumb{
+    position:relative; width:100%; aspect-ratio:16/9; border-radius:16px; overflow:hidden;
+    border:1px solid var(--card-border); background:var(--bg);
+  }
+  .proj-thumb img{
+    width:100%; height:100%; display:block;
+    object-fit:cover; object-position:center;
+  }
+
+  .proj-content{padding:18px 6px 4px;}
+  .proj-title-row{display:flex; align-items:center; gap:10px; margin-bottom:10px;}
+  
+  .proj-title{font-size:17px; font-weight:700; color:var(--text); letter-spacing:-.2px;}
+  .proj-desc{font-size:13.5px; line-height:1.6; color:var(--text-dim); margin-bottom:16px;}
+  .proj-badges{display:flex; flex-wrap:wrap; gap:8px; margin-bottom:18px;}
+  .proj-badge{
+    padding:5px 12px; background:rgba(255,255,255,.06); border:1px solid var(--card-border);
+    border-radius:20px; font-size:11.5px; font-weight:500; color:var(--text-dim); letter-spacing:.1px;
+  }
+  .proj-footer{display:flex; align-items:center; justify-content:space-between; padding-top:14px; border-top:1px solid var(--card-border);}
+  .proj-date{display:flex; align-items:center; gap:6px; font-size:12.5px; color:var(--text-dim); font-weight:500;}
+  .proj-date svg{width:14px; height:14px; opacity:.7;}
+  .proj-view{
+    display:flex; align-items:center; gap:5px; font-size:13px; font-weight:600; color:var(--text);
+    text-decoration:none; cursor:pointer; transition:gap .2s ease, opacity .2s ease;
+  }
+  .proj-view:hover{gap:8px; opacity:.75;}
+  .proj-view svg{width:14px; height:14px;}
+  .grid-projects-v2{grid-template-columns:1fr 1fr;}
+
   /* CERTIFICATES */
   .cert-list{display:flex; flex-direction:column; gap:14px;}
   .cert-item{display:flex; align-items:center; gap:12px;}
@@ -351,7 +386,7 @@
 
   /* RESPONSIVE */
   @media (max-width:980px){
-    .grid-hero, .grid-three, .grid-projects, .grid-projects2, .grid-bottom, .g-hero, .g3, .g2, .g-proof{grid-template-columns:1fr;}
+    .grid-hero, .grid-three, .grid-projects, .grid-projects2, .grid-bottom, .g-hero, .g3, .g2, .g-proof, .grid-projects-v2{grid-template-columns:1fr;}
     .nav-links{display:none;}
     .burger{display:block;}
   }
@@ -409,7 +444,7 @@
         <div class="avatar">MD</div>
         <div>
           <div class="profile-name">Mark Dale Elroy Bagui</div>
-          <div class="profile-title">Aspiring Cybersecurity/SOC Analyst</div>
+          <div class="profile-title">Aspiring Cybersecurity</div>
         </div>
         <span class="status-pill"><span class="status-dot"></span> Open to Work</span>
         <div class="location-row">📍 Sariaya, Quezon</div>
@@ -421,7 +456,7 @@
       <div class="card intro-card reveal" style="transition-delay:.08s">
         <div class="eyebrow">Welcome</div>
         <div class="intro-text">
-          I'm a fresh graduate passionate about <span class="grad">Penetration Testing</span> and learning new technologies.
+          I'm a fresh graduate passionate about <span class="grad">Ethical Hacking</span> and learning new technologies.
         </div>
         <div class="btn-row">
           <a href="#projects" class="btn btn-primary">View Projects</a>
@@ -544,206 +579,146 @@
     </div>
   </section>
 
-  <!-- HTB WRITE-UPS -->
-  <section id="htb" class="section section-pad-top0">
-    <div class="section-label">Resume Evidence Section</div>
-    <h2 class="section-heading">Hack The Box Write-ups</h2>
-    <p class="section-sub">These are real, completed Hack The Box machines documented as verifiable proof of hands-on cybersecurity experience — included as supporting evidence on my resume for SOC analyst and penetration testing applications.</p>
-    <div style="margin:18px 0 26px;">
-  <img src="https://www.hackthebox.com/badge/image/3430497" 
-       alt="Hack The Box Rank Badge" 
-       style="max-width:300px; border-radius:12px; border:1px solid var(--card-border);">
-
-       <iframe src="https://tryhackme.com/api/v2/badges/public-profile?userPublicId=edlrydale" 
-        style="border:none;" 
-        width="100%" 
-        height="200"
-        title="TryHackMe Badge">
-      </iframe>
-      </div>
-    <div class="card htb-card reveal">
-      <a href="#" class="htb-row">
-        <span class="diff-badge diff-easy">EASY</span>
-        <div class="htb-info">
-          <div class="htb-name">Meow</div>
-          <div class="htb-tags"><span>Linux</span> · <span>Nmap</span> · <span>SSH</span></div>
-        </div>
-        <span class="htb-arrow">View Write-up →</span>
-      </a>
-      <a href="htb/very_easy/fawn.html" class="htb-row">
-        <span class="diff-badge diff-easy">VERY EASY</span>
-        <div class="htb-info">
-          <div class="htb-name">Fawn</div>
-          <div class="htb-tags"><span>Linux</span> · <span>FTP Enumeration</span></div>
-        </div>
-        <span class="htb-arrow">View Write-up →</span>
-      </a>
-
-      <a href="htb/very_easy/redeem.html" class="htb-row">
-        <span class="diff-badge diff-easy">VERY EASY</span>
-        <div class="htb-info">
-          <div class="htb-name">Redeem</div>
-          <div class="htb-tags"><span>Linux</span> · <span>Redis Database Server</span></div>
-        </div>
-        <span class="htb-arrow">View Write-up →</span>
-      </a>
-      <a href="htb/very_easy/dancing.html" class="htb-row">
-        <span class="diff-badge diff-medium">VERY EASY</span>
-        <div class="htb-info">
-          <div class="htb-name">Dancing</div>
-          <div class="htb-tags"><span>Windows</span> · <span>SMB Exploitation</span></div>
-        </div>
-        <span class="htb-arrow">View Write-up →</span>
-      </a>
-    </div>
-    <div style="display:flex; justify-content:center; margin-top:18px;">
-      <a href="htb/all_writeups.html" class="btn btn-ghost">View All Write-ups →</a>
-    </div>
-  </section>
-
-  <!-- PROOF OF WORK GALLERY -->
-  <section id="proof" class="section section-pad-top0">
-    <div class="section-label">Resume Evidence</div>
-    <h2 class="section-heading">Proof of Work</h2>
-    <p class="section-sub">Screenshots and terminal output from completed labs and Hack The Box machines, included as verified evidence of hands-on cybersecurity practice.</p>
-
-    <div class="grid g-proof">
-      <div class="card proof-item reveal">
-        <div class="proof-thumb">
-          <div class="proof-thumb-grid"></div>
-          <div class="terminal-mock">
-            <div class="terminal-dots"><span></span><span></span><span></span></div>
-            <div class="terminal-line"><span class="prompt">$</span> nmap -sV 10.10.10.13</div>
-            <div class="terminal-line">22/tcp <span class="ok">open</span> ssh</div>
-            <div class="terminal-line">PORT STATE SERVICE</div>
-          </div>
-        </div>
-        <div class="proof-body">
-          <div class="evidence-tag">📌 Resume Evidence</div>
-          <div class="proof-caption">Meow – Nmap Initial Scan (Resume Evidence)</div>
-          <div class="proof-evidence-label">Hack The Box · Linux Target</div>
-        </div>
-      </div>
-
-      <div class="card proof-item reveal" style="transition-delay:.05s">
-        <div class="proof-thumb">
-          <div class="proof-thumb-grid"></div>
-          <div class="terminal-mock">
-            <div class="terminal-dots"><span></span><span></span><span></span></div>
-            <div class="terminal-line"><span class="prompt">$</span> ftp 10.10.10.51</div>
-            <div class="terminal-line">220 (vsFTPd 3.0.3)</div>
-            <div class="terminal-line">Anonymous login <span class="ok">OK</span></div>
-          </div>
-        </div>
-        <div class="proof-body">
-          <div class="evidence-tag">📌 Resume Proof</div>
-          <div class="proof-caption">Fawn – FTP Enumeration (Resume Proof)</div>
-          <div class="proof-evidence-label">Hack The Box · Linux Target</div>
-        </div>
-      </div>
-
-      <div class="card proof-item reveal" style="transition-delay:.1s">
-        <div class="proof-thumb">
-          <div class="proof-thumb-grid"></div>
-          <div class="terminal-mock">
-            <div class="terminal-dots"><span></span><span></span><span></span></div>
-            <div class="terminal-line"><span class="prompt">$</span> smbclient -L \\10.10.10.6</div>
-            <div class="terminal-line">Sharename &nbsp; Type</div>
-            <div class="terminal-line">WorkShares <span class="ok">Disk</span></div>
-          </div>
-        </div>
-        <div class="proof-body">
-          <div class="evidence-tag">📌 Hands-on Practice</div>
-          <div class="proof-caption">Dancing – SMB Exploitation (Hands-on Practice)</div>
-          <div class="proof-evidence-label">Hack The Box · Windows Target</div>
-        </div>
-      </div>
-
-      <div class="card proof-item reveal" style="transition-delay:.15s">
-        <div class="proof-thumb">
-          <div class="proof-thumb-grid"></div>
-          <div class="terminal-mock">
-            <div class="terminal-dots"><span></span><span></span><span></span></div>
-            <div class="terminal-line"><span class="prompt">$</span> wireshark -i eth0</div>
-            <div class="terminal-line">Capturing on 'eth0'</div>
-            <div class="terminal-line">1542 packets <span class="ok">captured</span></div>
-          </div>
-        </div>
-        <div class="proof-body">
-          <div class="evidence-tag">📌 Resume Evidence</div>
-          <div class="proof-caption">Wireshark – Packet Capture Analysis (Lab Practice)</div>
-          <div class="proof-evidence-label">Home Lab · Traffic Inspection</div>
-        </div>
-      </div>
-
-      <div class="card proof-item reveal" style="transition-delay:.2s">
-        <div class="proof-thumb">
-          <div class="proof-thumb-grid"></div>
-          <div class="terminal-mock">
-            <div class="terminal-dots"><span></span><span></span><span></span></div>
-            <div class="terminal-line"><span class="prompt">$</span> ls -la /etc/passwd</div>
-            <div class="terminal-line">-rw-r--r-- 1 root root</div>
-            <div class="terminal-line"><span class="prompt">$</span> whoami</div>
-          </div>
-        </div>
-        <div class="proof-body">
-          <div class="evidence-tag">📌 Resume Evidence</div>
-          <div class="proof-caption">Linux Enumeration – CLI & Permissions (Resume Proof)</div>
-          <div class="proof-evidence-label">Home Lab · Ubuntu Server</div>
-        </div>
-      </div>
-
-      <div class="card proof-item reveal" style="transition-delay:.25s">
-        <div class="proof-thumb">
-          <div class="proof-thumb-grid"></div>
-          <div class="terminal-mock">
-            <div class="terminal-dots"><span></span><span></span><span></span></div>
-            <div class="terminal-line">VirtualBox — Lab Network</div>
-            <div class="terminal-line">Kali Linux <span class="ok">Running</span></div>
-            <div class="terminal-line">Target VM <span class="ok">Running</span></div>
-          </div>
-        </div>
-        <div class="proof-body">
-          <div class="evidence-tag">📌 Resume Evidence</div>
-          <div class="proof-caption">Home Lab Setup – VM Environment (Resume Evidence)</div>
-          <div class="proof-evidence-label">VirtualBox · Isolated Lab Network</div>
-        </div>
-      </div>
-    </div>
-  </section>
 
   <!-- PROJECTS -->
   <div class="section-title">Featured Work</div>
   <section id="projects" class="bento-section" style="padding-top:0;">
-    <div class="grid grid-projects">
-      <div class="card reveal">
-        <div class="project-thumb">
-          <div class="project-thumb-grid"></div>
-          <span class="project-thumb-icon">🛒</span>
+    <div class="grid grid-projects-v2">
+
+      <div class="card proj-card reveal">
+        <div class="proj-thumb">
+          <img src="bilibeads.png" alt="Bilibeads e-commerce platform screenshot" />
         </div>
-        <div class="project-name">Bilibeads — E-commerce Platform</div>
-        <div class="project-desc">A full-stack online store with cart management, user authentication, and an admin dashboard for inventory control. Built as a capstone project to apply real-world web development practices.</div>
-        <div class="tech-row">
-          <span class="tech-tag">Laravel</span><span class="tech-tag">PHP</span><span class="tech-tag">MySQL</span><span class="tech-tag">Kotlin</span><span class="tech-tag">Hostinger</span>
-        </div>
-        <div class="link-row">
-          <a href="#" class="btn btn-ghost">⌥ GitHub</a>
+
+        <div class="proj-content">
+          <div class="proj-title-row">
+            <div class="proj-icon">🛒</div>
+            <div class="proj-title">Bilibeads — E-commerce Platform</div>
+          </div>
+          <p class="proj-desc">A full-stack online store with cart management, user authentication, and an admin dashboard for inventory control. Built as a capstone project to apply real-world web development practices.</p>
+          <div class="proj-badges">
+            <span class="proj-badge">Laravel</span>
+            <span class="proj-badge">PHP</span>
+            <span class="proj-badge">MySQL</span>
+            <span class="proj-badge">Kotlin</span>
+            <span class="proj-badge">Hostinger</span>
+          </div>
+          <div class="proj-footer">
+            <div class="proj-date">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10H21M8 3V7M16 3V7"/></svg>
+              2023
+            </div>
+            <a class="proj-view" href="https://github.com/DaleElroy/bilibeadsfullstack.git">
+              GitHub
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12H19M13 6L19 12L13 18"/></svg>
+            </a>
+          </div>
         </div>
       </div>
-      <div class="card reveal" style="transition-delay:.08s">
-        <div class="project-thumb project2-thumb">
-          <div class="project-thumb-grid"></div>
-          <span class="project-thumb-icon">✅</span>
+
+      <div class="card proj-card reveal" style="transition-delay:.08s">
+        <div class="proj-thumb">
+          <img src="cisco.png" alt="PHINMA-UPANG network security plan Packet Tracer topology screenshot" />
         </div>
-        <div class="project-name">Design and Implementation: A Comprehensive Network Security Plan for PHINMA-UPANG College of Urdaneta</div>
-        <div class="project-desc">Implemented network security concepts such as firewall rules, segmentation, and user access policies using network simulation.</div>
-        <div class="tech-row">
-          <span class="tech-tag">Cisco Packet Tracer</span>
-        </div>
-        <div class="link-row">
-          <a href="#" class="btn btn-ghost">⌥ List of Commands</a>
+
+        <div class="proj-content">
+          <div class="proj-title-row">
+            <div class="proj-icon">🌐</div>
+            <div class="proj-title">Network Security Plan — PHINMA-Urdaneta</div>
+          </div>
+          <p class="proj-desc">Designed and implemented a comprehensive network security plan for PHINMA-UPANG College of Urdaneta, applying firewall rules, segmentation, and user access policies using network simulation.</p>
+          <div class="proj-badges">
+            <span class="proj-badge">Cisco Packet Tracer</span>
+            <span class="proj-badge">Network Security</span>
+          </div>
+          <div class="proj-footer">
+            <div class="proj-date">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10H21M8 3V7M16 3V7"/></svg>
+              2024
+            </div>
+            <a class="proj-view" href="#">
+              List of Commands
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12H19M13 6L19 12L13 18"/></svg>
+            </a>
+          </div>
         </div>
       </div>
+      
+
+
+
+
+
+
+
+
+
+
+
+
+      <div class="card proj-card reveal">
+        <div class="proj-thumb">
+          <img src="ad.png" alt="Bilibeads e-commerce platform screenshot" />
+        </div>
+
+        <div class="proj-content">
+          <div class="proj-title-row">
+            <div class="proj-icon">🖧</div>
+            <div class="proj-title">Active Directory</div>
+          </div>
+          <p class="proj-desc">A self-driven home lab project where I installed Windows Server 2019, promoted it to a domain controller, and built out a full Active Directory environment</p>
+          <div class="proj-badges">
+            <span class="proj-badge">Virtual Machine</span>
+            <span class="proj-badge">Windows 10</span>
+          </div>
+          <div class="proj-footer">
+            <div class="proj-date">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10H21M8 3V7M16 3V7"/></svg>
+              2026
+            </div>
+            <a class="proj-view" href="/documentation/index.html">
+              Documentation
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12H19M13 6L19 12L13 18"/></svg>
+            </a>
+          </div>
+        </div>
+      </div>
+
+
+
+
+      <div class="card proj-card reveal">
+        <div class="proj-thumb">
+          <img src="meta.png" alt="Bilibeads e-commerce platform screenshot" />
+        </div>
+
+        <div class="proj-content">
+          <div class="proj-title-row">
+            <div class="proj-icon">💻</div>
+            <div class="proj-title">Metasploit</div>
+          </div>
+          <p class="proj-desc">An isolated homelab using Kali Linux as the attacker and Metasploitable2 as the vulnerable target to practice reconnaissance with Nmap, exploitation of Samba, persistence, and root access via Metasploit.</p>
+          <div class="proj-badges">
+            <span class="proj-badge">Virtual Machine</span>
+            <span class="proj-badge">Metasploitable 2</span>
+            <span class="proj-badge">Kali Linux</span>
+            <span class="proj-badge">Nmap</span>
+          </div>
+          <div class="proj-footer">
+            <div class="proj-date">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10H21M8 3V7M16 3V7"/></svg>
+              2026
+            </div>
+            <a class="proj-view" href="/documentation/metasploit.html">
+              Documentation
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12H19M13 6L19 12L13 18"/></svg>
+            </a>
+          </div>
+        </div>
+      </div>
+
+      
+
     </div>
 
     <div class="grid grid-bottom" style="margin-top:20px;">
@@ -798,7 +773,8 @@
 <footer>
   <div class="wrap" style="display:flex; align-items:center; justify-content:space-between; width:100%; flex-wrap:wrap; gap:10px;">
     <div class="footer-text">Built with React + Tailwind</div>
-    <div class="footer-text">Last updated: July 3, 2026</div>
+    <div class="footer-text">Last updated: <span class="js-last-updated"></span></div>
+  <script src="latest.update.js"></script>
     <div class="footer-text">© 2026 Mark Dale. All rights reserved.</div>
   </div>
 </footer>

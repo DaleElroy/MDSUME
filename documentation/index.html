@@ -1,0 +1,564 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Active Directory Home Lab — Mark Dale Elroy Bagui</title>
+
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="ambient">
+  <div class="blob b1"></div>
+  <div class="blob b2"></div>
+  <div class="blob b3"></div>
+</div>
+<div class="noise"></div>
+
+<!-- ===================== NAV ===================== -->
+<nav>
+  <div class="nav-inner">
+    <a href="../index.html">Mark Dale Elroy Bagui</a>
+    <div>
+      <a href="../index.html#projects" class="back-link">← Back to Portfolio</a>
+    </div>
+  </div>
+</nav>
+
+<div class="container">
+
+  <!-- ===================== BREADCRUMB + TITLE ===================== -->
+  <div class="breadcrumb">
+    <a href="../index.html">Portfolio</a> /
+    <a href="../index.html#projects">Projects</a> /
+    Active Directory Home Lab
+  </div>
+
+  <div class="title-row">
+    <h1>Building an Active Directory Home Lab</h1>
+    <span class="badge">Home Lab</span>
+  </div>
+
+  <div class="tags">
+    <span class="badge">🪟 Windows Server 2019</span>
+    <span class="badge">🖧 Active Directory</span>
+    <span class="badge">🛡️ Group Policy</span>
+  </div>
+
+  <p class="subtitle">
+    A self-driven home lab project where I installed Windows Server 2019, promoted it to a domain controller, and built out a full Active Directory environment — including Organizational Units, security groups, users, and Group Policy Objects — to practice real-world enterprise IT administration.
+  </p>
+
+  <!-- ===================== 1. INSTALLATION ===================== -->
+  <div class="section">
+    <h2><span class="step-label">1</span>Windows Server Setup</h2>
+    <p>Installed Windows Server 2019 Evaluation inside a virtual machine as the foundation for the lab environment.</p>
+
+    <table>
+      <tr><th>Setting</th><th>Value</th></tr>
+      <tr><td>Operating System</td><td>Windows Server 2019 Evaluation</td></tr>
+      <tr><td>Architecture</td><td>64-bit (x64)</td></tr>
+      <tr><td>Version</td><td>1809 (OS Build 17763.3650)</td></tr>
+    </table>
+
+    <div class="img-grid">
+      <div class="img-box">
+        <div class="img-frame"><img src="img/Windows_Setup_Virtual Machine.png" alt="Windows Server installation progress screen" onclick="openLightbox('img/Windows_Setup_Virtual Machine.png')"></div>
+        <div class="img-caption">Windows Server installation in progress</div>
+      </div>
+      <div class="img-box">
+        <div class="img-frame"><img src="img/Customize settingas.png" alt="Setting the built-in administrator password" onclick="openLightbox('img/Customize settingas.png')"></div>
+        <div class="img-caption">Setting the built-in administrator password</div>
+      </div>
+    </div>
+
+    <div class="img-grid single">
+      <div class="img-box">
+        <div class="img-frame"><img src="img/WinVersion.png" alt="Confirming Windows Server 2019 version details" onclick="openLightbox('img/WinVersion.png')"></div>
+        <div class="img-caption">Confirmed version: Windows Server 2019, Build 17763.3650</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================== 2. SERVER MANAGER ===================== -->
+  <div class="section">
+    <h2><span class="step-label">2</span>Server Manager Dashboard</h2>
+    <p>Server Manager is the primary management console in Windows Server. It's used to configure the server, install roles and features, monitor system status, and manage the services required for the Active Directory environment.</p>
+
+    <div class="img-grid single">
+      <div class="img-box">
+        <div class="img-frame"><img src="img/Dashboard.png" alt="Server Manager dashboard overview" onclick="openLightbox('img/Dashboard.png')"></div>
+        <div class="img-caption">Server Manager dashboard on first login</div>
+      </div>
+    </div>
+
+    <h3>Add Roles and Features Wizard</h3>
+    <p>Used the wizard to install <strong>Active Directory Domain Services (AD DS)</strong>, along with DHCP, DNS, and Remote Access roles required for the lab.</p>
+
+    <div class="img-grid">
+      <div class="img-box"><div class="img-frame"><img src="img/Installation_Type.png" alt="Select installation type step" onclick="openLightbox('img/Installation_Type.png')"></div><div class="img-caption">1. Select installation type</div></div>
+      <div class="img-box"><div class="img-frame"><img src="img/Server_Selection.png" alt="Select destination server step" onclick="openLightbox('img/Server_Selection.png')"></div><div class="img-caption">2. Select destination server</div></div>
+      <div class="img-box"><div class="img-frame"><img src="img/Server_Selection.png" alt="Select server roles step" onclick="openLightbox('img/Server_Selection.png')"></div><div class="img-caption">3–4. Select server roles</div></div>
+      <div class="img-box"><div class="img-frame"><img src="img/Confirmation.png" alt="Confirmation step" onclick="openLightbox('img/Confirmation.png')"></div><div class="img-caption">5. Confirm installation selections</div></div>
+      <div class="img-box"><div class="img-frame"><img src="img/Installation_succeed.png" alt="Installation succeeded" onclick="openLightbox('img/Installation_succeed.png')"></div><div class="img-caption">6. Installation succeeded</div></div>
+    </div>
+  </div>
+
+  <!-- ===================== 3. DOMAIN CONTROLLER ===================== -->
+  <div class="section">
+    <h2><span class="step-label">3</span>Promoting the Server to a Domain Controller</h2>
+    <p>Configured the server as a new Active Directory forest, specifying a root domain name for the environment.</p>
+
+    <div class="value-block">
+      <span class="label">Root domain name:</span> edlrydomain.local
+    </div>
+
+    <div class="img-grid single">
+      <div class="img-box">
+        <div class="img-frame"><img src="img/Deployment_Configuration.png" alt="Deployment configuration: Add a new forest" onclick="openLightbox('img/Deployment_Configuration.png')"></div>
+        <div class="img-caption">Deployment Configuration — Add a new forest</div>
+      </div>
+    </div>
+
+
+    <h3>Paths</h3>
+    <p>Specified the default locations for the AD DS database, log files, and SYSVOL folder.</p>
+    <div class="img-grid single">
+      <div class="img-box"><div class="img-frame"><img src="img/Paths.png" alt="AD DS database, log files, and SYSVOL paths" onclick="openLightbox('img/Paths.png')"></div></div>
+    </div>
+
+    <h3>Domain Controller Options</h3>
+    <p>Set the forest and domain functional levels to Windows Server 2016, enabled DNS server and Global Catalog, and set the Directory Services Restore Mode (DSRM) password.</p>
+
+    <div class="value-block">
+      <span class="label">DSRM Password:</span> HomelabDirectory123!
+    </div>
+
+    <div class="img-grid single">
+      <div class="img-box"><div class="img-frame"><img src="img/Domain_Controller.png" alt="Domain controller options configuration" onclick="openLightbox('img/Domain_Controller.png')"></div></div>
+    </div>
+
+    <div class="img-grid">
+      <div class="img-box"><div class="img-frame"><img src="img/Prerequisites Check.png" alt="Prerequisites check passed" onclick="openLightbox('img/Prerequisites Check.png')"></div><div class="img-caption">Prerequisites check — passed</div></div>
+      <div class="img-box"><div class="img-frame"><img src="img/Installation_Server.png" alt="AD DS installation in progress" onclick="openLightbox('img/Installation_Server.png')"></div><div class="img-caption">Installation in progress</div></div>
+    </div>
+
+    <div class="img-grid single">
+      <div class="img-box"><div class="img-frame"><img src="img/Restart_for_server.png" alt="Server restart prompt after promotion" onclick="openLightbox('img/Restart_for_server.png')"></div><div class="img-caption">Server automatically restarts to complete promotion</div></div>
+    </div>
+
+    <h3>Domain Controller Login</h3>
+    <p>The login screen displayed the newly created Active Directory domain, confirming the server was now operating as the domain controller for the <strong>EDLRYDOMAIN</strong> domain.</p>
+    <div class="img-grid single">
+      <div class="img-box"><div class="img-frame"><img src="img/DC_Login.png" alt="Login screen showing EDLRYDOMAIN Administrator" onclick="openLightbox('img/DC_Login.png')"></div></div>
+    </div>
+  </div>
+
+  <!-- ===================== 4. AD USERS AND COMPUTERS ===================== -->
+  <div class="section">
+    <h2><span class="step-label">4</span>Active Directory Users and Computers (ADUC)</h2>
+    <p>ADUC is the primary administrative tool used to manage objects within an Active Directory domain — creating and managing user accounts, computer accounts, security groups, and Organizational Units (OUs). Used here to organize and administer the EDLRYDOMAIN domain after AD DS installation.</p>
+
+    <div class="img-grid single">
+      <div class="img-box"><div class="img-frame"><img src="img/ADUC.png" alt="Active Directory Users and Computers console" onclick="openLightbox('img/ADUC.png')"></div></div>
+    </div>
+
+    <h3>Creating Organizational Units for Regions</h3>
+    <p>Created top-level OUs to organize the domain by region: <strong>USA</strong>, <strong>Europe</strong>, and <strong>Asia</strong>. OUs provide a logical structure that simplifies management and allows Group Policies to be applied to specific sections of the domain.</p>
+
+    <div class="img-grid single">
+      <div class="img-box"><div class="img-frame"><img src="img/Creating_OUs.png" alt="USA, Europe, and Asia organizational units" onclick="openLightbox('img/Creating_OUs.png')"></div></div>
+    </div>
+
+    <h3>Creating Departmental Sub-OUs</h3>
+    <p>Inside each regional OU, created sub-units for <strong>Computers</strong>, <strong>Users</strong>, and <strong>Servers</strong> to separate resource types and simplify administration.</p>
+
+    <div class="img-grid single">
+      <div class="img-box"><div class="img-frame"><img src="img/Create_OU_inside_of_OU.png" alt="Computers, Users, and Servers sub-OUs under each region" onclick="openLightbox('img/Create_OU_inside_of_OU.png')"></div></div>
+    </div>
+  </div>
+
+  <!-- ===================== 5. GROUPS AND USERS ===================== -->
+  <div class="section">
+    <h2><span class="step-label">5</span>Security Groups and Users</h2>
+    <p>Before creating accounts, reviewed the different group scopes and types available in Active Directory:</p>
+
+    <table>
+      <tr><th>Group Scope</th><th>Possible Members</th><th>Notes</th></tr>
+      <tr><td>Universal</td><td>Accounts from any domain</td><td>Usable across the entire forest / trusting forests</td></tr>
+      <tr><td>Global</td><td>Accounts from the same domain</td><td>Usable in the same forest or trusting domains/forests</td></tr>
+      <tr><td>Domain Local</td><td>Accounts from any domain or trusted domain</td><td>Usable within the same domain only</td></tr>
+    </table>
+
+    <table>
+      <tr><th>Group Type</th><th>Purpose</th></tr>
+      <tr><td>Security Groups</td><td>Assign permissions to shared resources and user rights (e.g. Domain Admins, Finance Department access)</td></tr>
+      <tr><td>Distribution Groups</td><td>Create email distribution lists to send mail to a collection of users via an email/exchange server</td></tr>
+    </table>
+
+    <p>Created security groups and departmental accounts across all regional OUs — <strong>IT, Accounting, HR, Sales, and Management</strong> — for the USA, Europe, and Asia regions.</p>
+
+    <div class="value-block">
+      <span class="label">Sample user account —</span> Username: edlryjob &nbsp; | &nbsp; Password: HomelabDirectory123!
+    </div>
+
+    <div class="img-grid">
+      <div class="img-box"><div class="img-frame"><img src="img/Users_USA.png" alt="Creating a new user account, step 1" onclick="openLightbox('img/Users_USA.png')"></div></div>
+      <div class="img-box"><div class="img-frame"><img src="img/userpass_USA.png" alt="Creating a new user account, step 2" onclick="openLightbox('img/userpass_USA.png')"></div></div>
+    </div>
+
+    <div class="img-grid single">
+      <div class="img-box">
+        <div class="img-frame"><img src="img/Groups _users.png" alt="Completed Active Directory structure with groups and users" onclick="openLightbox('img/Groups _users.png')"></div>
+        <div class="img-caption">Completed structure — OUs for USA, Europe, and Asia with their Computers, Users, Servers, and security groups</div>
+      </div>
+    </div>
+
+    <div class="callout">
+      💡 <strong>Result:</strong> User and computer accounts were successfully created within the IT Organizational Unit, then the same process was repeated for Accounting, HR, Sales, and Management across all three regional OUs.
+    </div>
+  </div>
+
+  <!-- ===================== 6. GROUP POLICY ===================== -->
+  <div class="section">
+    <h2><span class="step-label">6</span>Group Policy Management</h2>
+    <p>Group Policy provides centralized administration of user and computer settings across a Windows network using Active Directory — allowing standardized configurations, security rules, software deployment, and desktop environments to be managed from a single console.</p>
+
+    <div class="img-grid single">
+      <div class="img-box"><div class="img-frame"><img src="img/GPM.png" alt="Group Policy Management console" onclick="openLightbox('img/GPM.png')"></div></div>
+    </div>
+
+    <table>
+      <tr><th>Setting Type</th><th>Applies To</th></tr>
+      <tr><td>Computer Configuration</td><td>Applies to the local computer and does not change per user. Includes <em>Policies</em> (cannot be changed by users — e.g. password policy, account lockout) and <em>Preferences</em> (can be changed by users — e.g. mapped drives, printers, shortcuts)</td></tr>
+      <tr><td>User Configuration</td><td>Applies to the user's account and follows them to any computer they log into, including new machines in the future</td></tr>
+    </table>
+
+    <h3>Password Policy</h3>
+    <p>Configured a new GPO to enforce strong passwords and improve account security.</p>
+
+    <table>
+      <tr><th>Policy</th><th>Value</th></tr>
+      <tr><td>Minimum password length</td><td>8 characters</td></tr>
+      <tr><td>Password complexity requirements</td><td>Enabled</td></tr>
+      <tr><td>Maximum password age</td><td>90 days (quarterly)</td></tr>
+    </table>
+
+    <div class="img-grid">
+      <div class="img-box"><div class="img-frame"><img src="img/Password_Policy.png" alt="Creating a new Password Policy GPO" onclick="openLightbox('img/Password_Policy.png')"></div></div>
+      <div class="img-box"><div class="img-frame"><img src="img/password_lengt.png" alt="Setting minimum password length" onclick="openLightbox('img/password_lengt.png')"></div></div>
+    </div>
+    <div class="img-grid">
+      <div class="img-box"><div class="img-frame"><img src="img/enable_complexity.png" alt="Enabling password complexity requirements" onclick="openLightbox('img/enable_complexity.png')"></div></div>
+      <div class="img-box"><div class="img-frame"><img src="img/password_age.png" alt="Setting maximum password age to 90 days" onclick="openLightbox('img/password_age.png')"></div></div>
+    </div>
+
+    <h3>Drive Mapping</h3>
+    <p>Configured a Group Policy Preference to automatically map a network drive for users — assigning a local drive letter to a remote network share so users can access centralized files as if they were local storage.</p>
+    <div class="value-block">
+      <span class="label">Location:</span> \\servername\folder &nbsp; | &nbsp; <span class="label">Drive Letter:</span> First available, starting at C:
+    </div>
+    <div class="img-grid">
+      <div class="img-box"><div class="img-frame"><img src="img/Drive_Mapping.png" alt="New Drive Properties configuration" onclick="openLightbox('img/Drive_Mapping.png')"></div></div>
+      <div class="img-box"><div class="img-frame"><img src="img/Drive_map_output.png" alt="Configured drive map showing in Group Policy" onclick="openLightbox('img/Dive_map_output.png')"></div></div>
+    </div>
+
+    <h3>Additional Security Policies</h3>
+    <ul>
+      <li><strong>Desktop Wallpaper Policy</strong> — set a default desktop wallpaper for all domain users</li>
+      <li><strong>Restrict Access to Control Panel</strong> — prevented users from accessing Control Panel and PC settings</li>
+      <li><strong>Disable USB Storage</strong> — blocked users from using removable USB storage devices</li>
+      <li><strong>Account Lockout Policy</strong> — configured lockout duration, threshold, and reset counter settings to prevent brute-force attacks</li>
+    </ul>
+
+    <div class="img-grid">
+      <div class="img-box"><div class="img-frame"><img src="img/Desktop_wallpaper.png" alt="Desktop wallpaper policy setting" onclick="openLightbox('img/Desktop_wallpaper.png')"></div></div>
+      <div class="img-box"><div class="img-frame"><img src="img/control_policy.png" alt="Prohibit access to Control Panel and PC settings" onclick="openLightbox('img/control_policy.png')"></div></div>
+    </div>
+    <div class="img-grid">
+      <div class="img-box"><div class="img-frame"><img src="img/USB policy.png" alt="Disable removable USB storage policy" onclick="openLightbox('img/USB policy.png')"></div></div>
+      <div class="img-box"><div class="img-frame"><img src="img/Account_lockout.png" alt="Account lockout policy settings" onclick="openLightbox('img/Account_lockout.png')"></div></div>
+    </div>
+  </div>
+
+  <!-- ===================== 7. CLIENT MACHINE ===================== -->
+  <div class="section">
+    <h2><span class="step-label">7</span>Joining a Client Machine</h2>
+    <p>Installed a Windows 10 virtual machine to act as a domain-joined client, allowing the Group Policies configured above to be tested against a real end-user workstation.</p>
+
+    <div class="img-grid single">
+      <div class="img-box"><div class="img-frame"><img src="img/Windows_10_Installation.png" alt="Windows 10 installation license terms screen" onclick="openLightbox('img/Windows_10_Installation.png')"></div></div>
+    </div>
+
+    <h3>Windows Setup</h3>
+    <p>Walked through the initial Windows 10 setup screens, including region and locale selection.</p>
+    <div class="img-grid single">
+      <div class="img-box"><div class="img-frame"><img src="img/windows setup.png" alt="Windows 10 setup region selection screen" onclick="openLightbox('img/windows setup.png')"></div></div>
+    </div>
+
+    <h3>Local Account Setup</h3>
+    <p>Created a local account on the client machine before joining it to the domain.</p>
+    <div class="value-block">
+      <span class="label">Username:</span> pc01 &nbsp; | &nbsp; <span class="label">Password:</span> 12345678qwertY!
+    </div>
+    <div class="img-grid single">
+      <div class="img-box"><div class="img-frame"><img src="img/setting_username_password.png" alt="Setting up local username on Windows 10" onclick="openLightbox('img/setting_username_password.png')"></div></div>
+    </div>
+
+    <h3>Joining the Domain</h3>
+    <p>Before joining the domain, configured the IP address on both the server and the client, and pointed the client's DNS server setting to the domain controller so <strong>PC01-IT-Support</strong> could locate and authenticate against the domain.</p>
+
+    <div class="img-grid single">
+      <div class="img-box"><div class="img-frame"><img src="img/successful.png" alt="Computer Name/Domain Changes dialog joining the domain" onclick="openLightbox('img/successful.png')"></div></div>
+    </div>
+
+    <h3>Troubleshooting — Verifying Domain Communication</h3>
+    <p>Used <code>nslookup</code> to confirm the client could resolve and communicate with the domain controller before attempting to join.</p>
+
+    <div class="value-block">
+      <span class="label">Command:</span> nslookup -type=SRV _ldap._tcp.dc._msdcs.edlrydomain.local
+    </div>
+
+    <div class="img-grid single">
+      <div class="img-box"><div class="img-frame"><img src="img/configuration.png" alt="nslookup output confirming domain controller resolution" onclick="openLightbox('img/configuration.png')"></div></div>
+    </div>
+
+    <div class="callout">
+      💡 <strong>Why this matters:</strong> Confirming DNS resolution to the domain controller before joining is a standard troubleshooting step — most failed domain-join attempts trace back to a client pointing at the wrong DNS server.
+    </div>
+
+    <h3>Successful Domain Join</h3>
+    <p><strong>PC01-IT-Support</strong> successfully joined the <strong>EdlryDomain.local</strong> domain and the machine was restarted to apply the changes.</p>
+    <div class="img-grid">
+      <div class="img-box"><div class="img-frame"><img src="img/successful_join.png" alt="Welcome to the EdlryDomain.local domain confirmation" onclick="openLightbox('img/successful_join.png')"></div></div>
+      <div class="img-box"><div class="img-frame"><img src="img/successful_join1.png" alt="Restart required prompt to apply domain changes" onclick="openLightbox('img/successful_join1.png')"></div></div>
+    </div>
+
+    <h3>Signing In With the Domain User</h3>
+    <p>Signed in to the joined machine using the domain account, confirming the login worked against the EDLRYDOMAIN directory.</p>
+    <div class="img-grid">
+      <div class="img-box"><div class="img-frame"><img src="img/signin_user.png" alt="Sign in screen showing EDLRYDOMAIN user" onclick="openLightbox('img/signin_user.png')"></div></div>
+      <div class="img-box"><div class="img-frame"><img src="img/successful_user.png" alt="Successful login as domain user edlryAD1" onclick="openLightbox('img/successful_user.png')"></div></div>
+    </div>
+
+    <h3>Confirming and Organizing the Computer Object</h3>
+    <p>Verified in Active Directory Users and Computers that <strong>PC01-IT-SUPPORT</strong> now appeared as a joined computer object, then moved it out of the default Computers container and into the correct <strong>USA / Computer</strong> Organizational Unit to match the OU structure built earlier.</p>
+
+    <div class="img-grid single">
+      <div class="img-box"><div class="img-frame"><img src="img/successful_added_in_AD.png" alt="PC01-IT-SUPPORT computer object visible in ADUC" onclick="openLightbox('img/successful_added_in_AD.png')"></div></div>
+    </div>
+
+    <div class="img-grid">
+      <div class="img-box"><div class="img-frame"><img src="img/move1.png" alt="Moving PC01-IT-Support into the USA Computer OU" onclick="openLightbox('img/move1.png')"></div></div>
+      <div class="img-box"><div class="img-frame"><img src="img/done.png" alt="PC01-IT-Support successfully placed in the USA Computer OU" onclick="openLightbox('img/done.png')"></div></div>
+    </div>
+  </div>
+
+  <!-- ===================== PART 2 DIVIDER ===================== -->
+  <div class="section">
+    <div class="breadcrumb" style="margin-bottom:6px;">Part 2</div>
+    <h2 style="margin-bottom:6px;">File Services, Group Policy Drive Mapping &amp; FSRM</h2>
+    <p>A follow-up session on the same lab, covering file sharing, automated drive mapping through Group Policy, and File Server Resource Manager (FSRM) for quotas and file screening.</p>
+  </div>
+
+  <!-- ===================== 8. FILE SERVICES ===================== -->
+  <div class="section">
+    <h2><span class="step-label">8</span>File Services</h2>
+    <p>Set up file sharing within the Active Directory environment.</p>
+
+    <table>
+      <tr><th colspan="4">Permissions and Access Control</th></tr>
+      <tr><td>Read</td><td>Write</td><td>Execute</td><td>Full Control</td></tr>
+    </table>
+
+    <table>
+      <tr><th colspan="2">Types of Permissions</th></tr>
+      <tr><td>NTFS</td><td>Share</td></tr>
+    </table>
+
+    <table>
+      <tr><th colspan="2">Sharing Methods</th></tr>
+      <tr><td>Network</td><td>Mapped</td></tr>
+    </table>
+  </div>
+
+  <!-- ===================== 9. FILE SHARING ===================== -->
+  <div class="section">
+    <h2><span class="step-label">9</span>Set Up a File Sharing</h2>
+    <ul>
+      <li>Create shared folders with appropriate permissions</li>
+      <li>Set NTFS and share permissions to allow domain users access</li>
+    </ul>
+
+    <p>Created a folder on the Local Disk (C:) named <strong>SHARED</strong>.</p>
+    <div class="img-grid single">
+      <div class="img-box"><div class="img-frame"><img src="img/create_directory.png" alt="SHARED folder created on Local Disk C" onclick="openLightbox('img/')"></div></div>
+    </div>
+
+    <p>Opened the properties of the SHARED folder, enabled <strong>Share this Folder</strong>, clicked <strong>Add</strong>, typed <strong>domain</strong> in the object name field, then clicked <strong>Check Names</strong>.</p>
+    <div class="img-grid">
+      <div class="img-box"><div class="img-frame"><img src="img/Permission.png" alt="SHARED folder properties with Advanced Sharing enabled" onclick="openLightbox('img/Permission.png')"></div></div>
+      <div class="img-box"><div class="img-frame"><img src="img/add_names.png" alt="Select Users or Groups dialog with domain typed in and Check Names" onclick="openLightbox('img/add_names.png')"></div></div>
+    </div>
+
+    <p>Selected <strong>Domain Users</strong> from the matching names list, and for share permissions, selected <strong>Read</strong> only.</p>
+    <div class="img-grid">
+      <div class="img-box"><div class="img-frame"><img src="img/Domain_users.png" alt="Domain Users selected in Select Users or Groups dialog" onclick="openLightbox('img/Domain_users.png')"></div></div>
+      <div class="img-box"><div class="img-frame"><img src="img/permissions_users.png" alt="Read permission selected for Domain Users share permissions" onclick="openLightbox('img/permissions_users.png')"></div></div>
+    </div>
+
+    <p>Configured matching <strong>NTFS</strong> permissions on the Security tab for the SHARED folder.</p>
+    <div class="img-grid single">
+      <div class="img-box"><div class="img-frame"><img src="img/NTFS.png" alt="NTFS Security tab permissions for SHARED folder" onclick="openLightbox('img/NTFS.png')"></div></div>
+    </div>
+  </div>
+
+  <!-- ===================== 10. CLIENT DRIVE MAPPING ===================== -->
+  <div class="section">
+    <h2><span class="step-label">10</span>Mapping the Shared Drive on Client Machines</h2>
+    <ul>
+      <li>Log in to the client machines using domain user accounts</li>
+      <li>Map network drives to access shared folders</li>
+    </ul>
+
+    <div class="value-block">
+      <span class="label">Hostname:</span> WIN-B0OKCQIFKRN &nbsp; | &nbsp; <span class="label">Mapped path:</span> \\WIN-B0OKCQIFKRN\SHARED
+    </div>
+
+    <p>Right-clicked <strong>This PC</strong> → <strong>Map network drive</strong>. Ran <code>hostname</code> on the server terminal, which returned <strong>WIN-B0OKCQIFKRN</strong>, then mapped the folder to <strong>\\WIN-B0OKCQIFKRN\SHARED</strong>. Unchecked <strong>Reconnect at sign-in</strong> and finished.</p>
+
+    <div class="img-grid">
+      <div class="img-box"><div class="img-frame"><img src="img/Map_drives.png" alt="This PC context menu with Map network drive option" onclick="openLightbox('img/Map_drives.png')"></div></div>
+      <div class="img-box"><div class="img-frame"><img src="img/IN_Map_drives.png" alt="Map Network Drive dialog blank" onclick="openLightbox('img/IN_Map_drives.png')"></div></div>
+    </div>
+    <div class="img-grid">
+      <div class="img-box"><div class="img-frame"><img src="img/Shared_files.png" alt="Map Network Drive dialog with server path filled in" onclick="openLightbox('img/Shared_files.png')"></div></div>
+      <div class="img-box"><div class="img-frame"><img src="img/shared_successful.png" alt="Successfully connected mapped drive showing empty SHARED folder" onclick="openLightbox('img/shared_successful.png')"></div></div>
+    </div>
+
+    <div class="callout">
+      💡 <strong>Result:</strong> The drive mapped successfully as SHARED (\\WIN-B0OKCQIFKRN) (S:) and appeared under This PC as a network location.
+    </div>
+  </div>
+
+  <!-- ===================== 11. GPO DRIVE MAPPING ===================== -->
+  <div class="section">
+    <h2><span class="step-label">11</span>Automating the Drive Map with Group Policy</h2>
+    <p>Configured a Group Policy Object so the SHARED drive maps automatically for users, instead of relying on each client mapping it manually.</p>
+
+    <p>Created a GPO for mapped drives on the Windows Server and pointed it to the server's shared path.</p>
+    <div class="img-grid">
+      <div class="img-box"><div class="img-frame"><img src="img/create_drive map.png" alt="Group Policy Management console with Mapped Drives GPO" onclick="openLightbox('img/create_drive map.png')"></div></div>
+      <div class="img-box"><div class="img-frame"><img src="img/location.png" alt="New Drive Properties dialog in Group Policy Management Editor" onclick="openLightbox('img/location.png')"></div></div>
+    </div>
+    <div class="img-grid">
+      <div class="img-box"><div class="img-frame"><img src="img/Gpo.png" alt="Drive Maps preference showing created mapped drive" onclick="openLightbox('img/Gpo.png')"></div></div>
+      <div class="img-box"><div class="img-frame"><img src="img/applied_Gpo.png" alt="GPO linked to the USA Users OU" onclick="openLightbox('img/applied_Gpo.png')"></div></div>
+    </div>
+
+    <p>Applied the drive mapping GPO to the <strong>USA</strong> Users OU, then tested it with <code>gpupdate /force</code> and restarted the client PC to confirm the drive mapped automatically.</p>
+    <div class="value-block">
+      <span class="label">Command:</span> gpupdate /force
+    </div>
+    <div class="img-grid single">
+      <div class="img-box"><div class="img-frame"><img src="img/gpupdate.png" alt="gpupdate force command running in terminal" onclick="openLightbox('img/gpupdate.png')"></div></div>
+    </div>
+  </div>
+
+  <!-- ===================== 12. FSRM ===================== -->
+  <div class="section">
+    <h2><span class="step-label">12</span>File Server Resource Manager (FSRM)</h2>
+    <p>Implemented quotas and file screening using FSRM — configuring a Quota Template and a File Screen Template to manage file storage across the organization.</p>
+
+    <p>Installed the <strong>File Server Resource Manager</strong> role via the Add Roles and Features Wizard.</p>
+    <div class="img-grid">
+      <div class="img-box"><div class="img-frame"><img src="img/select_File Server.png" alt="Add Roles and Features Wizard with File Server Resource Manager selected" onclick="openLightbox('img/select_File Server.png')"></div></div>
+      <div class="img-box"><div class="img-frame"><img src="img/fsrm_installed.png" alt="File Server Resource Manager console confirming successful install" onclick="openLightbox('img/fsrm_installed.png')"></div></div>
+    </div>
+
+    <h3>Quota Management</h3>
+    <p>Selected the SHARED folder and defined quota properties to set a storage limit, with an email notification threshold.</p>
+    <div class="value-block">
+      <span class="label">Quota path:</span> C:\SHARED &nbsp; | &nbsp; <span class="label">Limit:</span> 100 MB (Hard)
+    </div>
+    <div class="img-grid">
+      <div class="img-box"><div class="img-frame"><img src="img/quota_management.png" alt="Create Quota dialog for C:\SHARED path" onclick="openLightbox('img/quota_management.png')"></div></div>
+      <div class="img-box"><div class="img-frame"><img src="img/selected_shared_folder.png" alt="Custom quota properties defined with 100 MB limit" onclick="openLightbox('img/selected_shared_folder.png')"></div></div>
+    </div>
+    <div class="img-grid single">
+      <div class="img-box"><div class="img-frame"><img src="img/change limit.png" alt="Add Threshold dialog configuring email notification at usage percentage" onclick="openLightbox('img/change limit.png')"></div></div>
+    </div>
+
+    <h3>File Screening Management</h3>
+    <p>File screening allows administrators to control which file types users can save on a server and to generate notifications when unauthorized files are attempted. Blocked Audio and Video Files, Compressed Files, Executable Files, Web Page Files, Image Files, and Text Files on the SHARED folder, and saved the configuration as a reusable template named <strong>SHARED</strong>.</p>
+    <div class="img-grid">
+      <div class="img-box"><div class="img-frame"><img src="img/summary_properties.png" alt="Create File Screen dialog for C:\SHARED" onclick="openLightbox('img/summary_properties.png')"></div></div>
+      <div class="img-box"><div class="img-frame"><img src="img/file_screening.png" alt="File Screen Properties with blocked file groups selected" onclick="openLightbox('img/file_screening.png')"></div></div>
+    </div>
+    <div class="img-grid">
+      <div class="img-box"><div class="img-frame"><img src="img/template_name.png" alt="Save Custom Properties as a Template dialog named SHARED" onclick="openLightbox('img/template_name.png')"></div></div>
+      <div class="img-box"><div class="img-frame"><img src="img/file_Created.png" alt="File Screens list showing SHARED template applied to C:\SHARED" onclick="openLightbox('img/file_Created.png')"></div></div>
+    </div>
+
+    <div class="callout">
+      💡 <strong>Result:</strong> The SHARED folder now enforces a 100 MB quota with email alerts, and blocks unauthorized file types through the SHARED file screen template.
+    </div>
+  </div>
+
+  <!-- ===================== KEY LEARNINGS ===================== -->
+  <div class="section">
+    <h2><span class="step-label">✓</span>Key Learnings</h2>
+    <ul>
+      <li>Promoted a Windows Server 2019 instance to a fully functioning Active Directory domain controller from scratch</li>
+      <li>Designed a regional + departmental OU structure (USA / Europe / Asia → IT, Accounting, HR, Sales, Management) that mirrors how real enterprise domains are organized</li>
+      <li>Practiced the difference between Universal, Global, and Domain Local group scopes, and Security vs Distribution group types</li>
+      <li>Built and tested multiple Group Policy Objects covering password security, account lockout, USB restriction, drive mapping, and desktop standardization</li>
+      <li>Reinforced how centralized policy management reduces manual configuration across many machines and enforces consistent security baselines</li>
+      <li>Joined a Windows 10 client to the domain end-to-end — configuring DNS correctly, verifying connectivity with <code>nslookup</code>, and troubleshooting before attempting the join</li>
+      <li>Practiced keeping Active Directory tidy by moving newly joined computer objects out of the default container and into the correct Organizational Unit</li>
+      <li>Set up file sharing with matching NTFS and share permissions, scoped to Domain Users with Read access</li>
+      <li>Automated network drive mapping across a domain using Group Policy Preferences, instead of relying on manual per-client setup</li>
+      <li>Configured FSRM to enforce storage quotas with email alerts, and used file screening to block unauthorized file types on a shared resource</li>
+    </ul>
+  </div>
+
+  <!-- ===================== BOTTOM NAV ===================== -->
+  <div class="bottom-nav">
+    <a href="../index.html#projects" class="btn btn-primary">Back to Projects</a>
+  </div>
+
+</div>
+
+<footer>
+  <div class="wrap" style="display:flex; align-items:center; justify-content:space-between; width:100%; flex-wrap:wrap; gap:10px;">
+    <div class="footer-text">Built with React + Tailwind</div>
+    <div class="footer-text">Last updated: <span class="js-last-updated"></span></div>
+  <script src="../latest.update.js"></script>
+    <div class="footer-text">© 2026 Mark Dale. All rights reserved.</div>
+  </div>
+</footer>
+
+<!-- ===================== LIGHTBOX ===================== -->
+<div class="lightbox-overlay" id="lightboxOverlay" onclick="closeLightbox()">
+  <div class="lightbox-close" onclick="closeLightbox()">✕</div>
+  <img id="lightboxImg" src="" alt="Enlarged view">
+</div>
+
+<script>
+  function openLightbox(src){
+    document.getElementById('lightboxImg').src = src;
+    document.getElementById('lightboxOverlay').classList.add('active');
+    document.body.style.overflow = 'hidden';
+  }
+  function closeLightbox(){
+    document.getElementById('lightboxOverlay').classList.remove('active');
+    document.body.style.overflow = '';
+  }
+  document.addEventListener('keydown', (e) => {
+    if(e.key === 'Escape') closeLightbox();
+  });
+</script>
+
+</body>
+</html>

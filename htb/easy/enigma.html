@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Nexus — HTB Write-up | Mark Dale Elroy Bagui</title>
+<title>Enigma — HTB Write-up | Mark Dale Elroy Bagui</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
@@ -85,23 +85,77 @@ tempalte sync service vulnerable to directory traversal, which is leveraged to g
           <pre><span class="c-comment"># -sC and -sV scan</span>
 <span class="c-prompt">$</span> nmap -sC -sV -oN 10.129.108.148
 <span class="c-prompt">PORT    STATE SERVICE
-Starting Nmap 7.99 ( https://nmap.org ) at 2026-07-04 01:36 +0800
-Nmap scan report for 10.129.108.148
-Host is up (0.45s latency).
-Not shown: 998 closed tcp ports (reset)
-PORT   STATE SERVICE VERSION
-22/tcp open  ssh     OpenSSH 9.6p1 Ubuntu 3ubuntu13.16 (Ubuntu Linux; protocol 2.0)
+Starting Nmap 7.99 ( https://nmap.org ) at 2026-07-14 04:06 +0800
+Nmap scan report for 10.129.239.191
+Host is up (0.49s latency).
+Not shown: 992 closed tcp ports (reset)
+PORT     STATE SERVICE  VERSION
+22/tcp   open  ssh      OpenSSH 9.6p1 Ubuntu 3ubuntu13.16 (Ubuntu Linux; protocol 2.0)
 | ssh-hostkey: 
 |   256 0c:4b:d2:76:ab:10:06:92:05:dc:f7:55:94:7f:18:df (ECDSA)
 |_  256 2d:6d:4a:4c:ee:2e:11:b6:c8:90:e6:83:e9:df:38:b0 (ED25519)
-80/tcp open  http    nginx 1.24.0 (Ubuntu)
+80/tcp   open  http     nginx 1.24.0 (Ubuntu)
+|_http-title: Did not follow redirect to http://enigma.htb/
 |_http-server-header: nginx/1.24.0 (Ubuntu)
-|_http-title: Did not follow redirect to http://nexus.htb/
+110/tcp  open  pop3     Dovecot pop3d
+| ssl-cert: Subject: commonName=enigma
+| Subject Alternative Name: DNS:enigma
+| Not valid before: 2026-02-18T20:33:33
+|_Not valid after:  2036-02-16T20:33:33
+|_pop3-capabilities: TOP UIDL SASL STLS CAPA PIPELINING AUTH-RESP-CODE RESP-CODES
+|_ssl-date: TLS randomness does not represent time
+111/tcp  open  rpcbind  2-4 (RPC #100000)
+| rpcinfo: 
+|   program version    port/proto  service
+|   100000  2,3,4        111/tcp   rpcbind
+|   100000  2,3,4        111/udp   rpcbind
+|   100000  3,4          111/tcp6  rpcbind
+|   100000  3,4          111/udp6  rpcbind
+|   100003  3,4         2049/tcp   nfs
+|   100003  3,4         2049/tcp6  nfs
+|   100005  1,2,3      36768/udp6  mountd
+|   100005  1,2,3      44076/udp   mountd
+|   100005  1,2,3      52063/tcp6  mountd
+|   100005  1,2,3      53061/tcp   mountd
+|   100021  1,3,4      35937/udp6  nlockmgr
+|   100021  1,3,4      37987/tcp   nlockmgr
+|   100021  1,3,4      38785/tcp6  nlockmgr
+|   100021  1,3,4      59889/udp   nlockmgr
+|   100024  1          34353/tcp   status
+|   100024  1          35673/tcp6  status
+|   100024  1          37657/udp   status
+|   100024  1          40420/udp6  status
+|   100227  3           2049/tcp   nfs_acl
+|_  100227  3           2049/tcp6  nfs_acl
+143/tcp  open  imap     Dovecot imapd (Ubuntu)
+|_imap-capabilities: IMAP4rev1 more ID have post-login SASL-IR ENABLE listed IDLE LOGIN-REFERRALS LITERAL+ 
+LOGINDISABLEDA0001 STARTTLS OK capabilities Pre-login
+|_ssl-date: TLS randomness does not represent time
+| ssl-cert: Subject: commonName=enigma
+| Subject Alternative Name: DNS:enigma
+| Not valid before: 2026-02-18T20:33:33
+|_Not valid after:  2036-02-16T20:33:33
+993/tcp  open  ssl/imap Dovecot imapd (Ubuntu)
+| ssl-cert: Subject: commonName=enigma
+| Subject Alternative Name: DNS:enigma
+| Not valid before: 2026-02-18T20:33:33
+|_Not valid after:  2036-02-16T20:33:33
+|_imap-capabilities: IMAP4rev1 ID more have SASL-IR post-login listed IDLE LOGIN-REFERRALS
+LITERAL+ Pre-login ENABLE OK capabilities AUTH=PLAINA0001
+|_ssl-date: TLS randomness does not represent time
+995/tcp  open  ssl/pop3 Dovecot pop3d
+|_pop3-capabilities: TOP UIDL SASL(PLAIN) USER CAPA PIPELINING AUTH-RESP-CODE RESP-CODES
+|_ssl-date: TLS randomness does not represent time
+| ssl-cert: Subject: commonName=enigma
+| Subject Alternative Name: DNS:enigma
+| Not valid before: 2026-02-18T20:33:33
+|_Not valid after:  2036-02-16T20:33:33
+2049/tcp open  nfs_acl  3 (RPC #100227)
 Service Info: OS: Linux; CPE: cpe:/o:linux:linux_kernel
 
-Service detection performed. Please report 
-any incorrect results at https://nmap.org/submit/ .
-Nmap done: 1 IP address (1 host up) scanned in 24.47 seconds
+Service detection performed. Please report any incorrect results at https://nmap.org/submit/ .
+Nmap done: 1 IP address (1 host up) scanned in 39.75 seconds
+
                                                                          </span></pre>
         </div>
         <p class="writeup-p">Open Ports <strong>22,80</strong> indicate possible remote login access if credentials are weak
